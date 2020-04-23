@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lolstats/BaseAppBar.dart';
 import 'package:lolstats/util.dart';
+import 'dart:developer';
 
 class UserScreen extends StatefulWidget {
   @override
@@ -19,6 +20,49 @@ class _UserScreen extends State<UserScreen> {
 
   int normalWins = 300;
   int normalLosses = 350;
+
+  List<Color> _colorsList = [
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+  ];
+  int perPage = 10;
+  int present = 0;
+
+  List<Color> items = List<Color>();
 
   Widget getGamesStatsText(String queueType, int wins, int losses,
       [String division = "", exampleDivisionIconLink = null]) {
@@ -84,19 +128,19 @@ class _UserScreen extends State<UserScreen> {
                   style: TextStyle(
                     shadows: [
                       Shadow(
-                        // bottomLeft
+                          // bottomLeft
                           offset: Offset(-1, -1),
                           color: Colors.white),
                       Shadow(
-                        // bottomRight
+                          // bottomRight
                           offset: Offset(1, -1),
                           color: Colors.white),
                       Shadow(
-                        // topRight
+                          // topRight
                           offset: Offset(1, 1),
                           color: Colors.white),
                       Shadow(
-                        // topLeft
+                          // topLeft
                           offset: Offset(-1, 1),
                           color: Colors.white),
                     ],
@@ -161,139 +205,87 @@ class _UserScreen extends State<UserScreen> {
       ),
     );
 
-    Widget matchHistory() {
-      return Expanded(
-        child: ListView(
-          scrollDirection: Axis.vertical,
-          shrinkWrap: true,
-          children: <Widget>[
-            Container(
-              width: double.maxFinite,
-              height: 100,
-              color: Colors.red,
-            ),
-            Container(
-              width: double.maxFinite,
-              height: 100,
-              color: Colors.blue,
-            ),
-            Container(
-              width: double.maxFinite,
-              height: 100,
-              color: Colors.green,
-            ),
-            Container(
-              width: double.maxFinite,
-              height: 100,
-              color: Colors.red,
-            ),
-            Container(
-              width: double.maxFinite,
-              height: 100,
-              color: Colors.blue,
-            ),
-            Container(
-              width: double.maxFinite,
-              height: 100,
-              color: Colors.green,
-            ),
-            Container(
-              width: double.maxFinite,
-              height: 100,
-              color: Colors.red,
-            ),
-            Container(
-              width: double.maxFinite,
-              height: 100,
-              color: Colors.blue,
-            ),
-            Container(
-              width: double.maxFinite,
-              height: 100,
-              color: Colors.green,
-            ),
-          ],
-        ),
+    void loadMore() {
+      setState(() {
+        if ((present + perPage) > _colorsList.length) {
+          items.addAll(_colorsList.getRange(present, _colorsList.length - 1));
+        } else {
+          items.addAll(_colorsList.getRange(present, present + perPage));
+        }
+        present = present + perPage;
+        if (present > _colorsList.length) {
+          present = _colorsList.length - 1;
+        }
+      });
+    }
+
+//    Widget _buildTile(BuildContext context, int index) {
+//      return (index == items.length)
+//          ? Container(
+//        color: Colors.greenAccent,
+//        child: FlatButton(
+//          child: Text("Load More"),
+//          onPressed: () => loadMore(),
+//        ),
+//      )
+//          : Container(
+//          width: double.maxFinite, height: 100, color: _colorsList[index]);
+//    }
+
+    Widget _buildTile(BuildContext context, int index) {
+      return Card(
+        elevation: 5,
+        child: Container(
+            width: double.maxFinite, height: 100, color: _colorsList[index]),
       );
     }
 
-//    const _colorsList = [
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//      Colors.red,
-//      Colors.blue,
-//      Colors.green,
-//    ];
-//
-//
-//    Widget _buildTile(BuildContext context, Color color) {
-//      return Container(
-//          width: double.maxFinite,
-//          height: 100,
-//          color: color
-//      );
-//    }
-//    return Scaffold(
-//      body: CustomScrollView(
-//        slivers: [
-//          BaseAppBar.getBaseSliverAppBar(context),
-//          SliverList(
-//            delegate: SliverChildBuilderDelegate(
-//                  (context, index) => _buildTile(context, _colorsList[index]),
-//              childCount: _colorsList.length,
-//            ),
-//          ),
-////          SliverToBoxAdapter(child: SizedBox(height: 12)),
-////          SliverList(
-////            delegate: SliverChildBuilderDelegate(
-////                    (context, index) => _MyListItem(index)),
-////          ),
-//        ],
-//      ),
-//    );
-
-    return SafeArea(
-        child: Scaffold(
-            appBar: BaseAppBar.getBaseAppBar(context),
-            body: Container(
-              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-              child: Column(
-                children: <Widget>[
-                  mainInfoSection,
-                  matchHistory(),
-                ],
+    return Scaffold(
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+            loadMore();
+          }
+        },
+        child: CustomScrollView(
+          slivers: [
+            BaseAppBar.getBaseSliverAppBar(context),
+            SliverToBoxAdapter(
+              child: mainInfoSection,
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => _buildTile(context, index),
+                childCount: (present <= _colorsList.length)
+                    ? items.length + 1
+                    : items.length,
               ),
-            )));
+            ),
+          ],
+        ),
+      ),
+    );
+
+//    return SafeArea(
+//        child: Scaffold(
+//            appBar: BaseAppBar.getBaseAppBar(context),
+//            body: Container(
+//              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+//              child: Column(
+//                children: <Widget>[
+//                  mainInfoSection,
+//                  matchHistory(),
+//                ],
+//              ),
+//            )));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      items.addAll(_colorsList.getRange(present, present + perPage));
+      present = present + perPage;
+    });
   }
 }

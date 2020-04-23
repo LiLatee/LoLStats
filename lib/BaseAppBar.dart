@@ -26,7 +26,7 @@ class BaseAppBar {
   static SliverAppBar getBaseSliverAppBar(BuildContext context) {
     return SliverAppBar(
       title: Text("LolStats"),
-      floating: true,
+      pinned: true,
       actions: <Widget>[
         Padding(
           padding: EdgeInsets.only(right: 20.0),
