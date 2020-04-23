@@ -22,6 +22,28 @@ class BaseAppBar {
       ],
     );
   }
+
+  static SliverAppBar getBaseSliverAppBar(BuildContext context) {
+    return SliverAppBar(
+      title: Text("LolStats"),
+      floating: true,
+      actions: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(right: 20.0),
+          child: IconButton(
+            tooltip: "Search anything",
+            icon: Icon(Icons.search, size: 26.0),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: CustomSearchDelegate(),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class CustomSearchDelegate extends SearchDelegate {
