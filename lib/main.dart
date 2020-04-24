@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lolstats/BaseAppBar.dart';
+import 'package:lolstats/common/themes.dart';
+import 'file:///D:/Dokumenty/Projekty/AndroidStudioProjects/lol_stats/lib/common/BaseAppBar.dart';
 import 'package:lolstats/screens/UserScreen.dart';
-import 'themes.dart';
+import 'common/themes.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -10,7 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: CustomThemes.getBaseTheme(),
+      theme: baseTheme,
       home: UserScreen(),
     );
   }

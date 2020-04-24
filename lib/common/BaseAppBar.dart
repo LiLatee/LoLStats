@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'themes.dart';
+import '../common/themes.dart';
 
 class BaseAppBar {
   static AppBar getBaseAppBar(BuildContext context) {
@@ -49,7 +49,7 @@ class BaseAppBar {
 class CustomSearchDelegate extends SearchDelegate {
   @override
   ThemeData appBarTheme(BuildContext context) {
-    return CustomThemes.getBaseTheme();
+    return baseTheme;
   }
 
   @override

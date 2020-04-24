@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lolstats/BaseAppBar.dart';
-import 'package:lolstats/util.dart';
+import 'package:lolstats/common/themes.dart';
+import 'file:///D:/Dokumenty/Projekty/AndroidStudioProjects/lol_stats/lib/common/BaseAppBar.dart';
+import 'package:lolstats/common/themes.dart';
+import 'file:///D:/Dokumenty/Projekty/AndroidStudioProjects/lol_stats/lib/common/util.dart';
 import 'dart:developer';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class UserScreen extends StatefulWidget {
   @override
@@ -10,6 +14,8 @@ class UserScreen extends StatefulWidget {
 }
 
 class _UserScreen extends State<UserScreen> {
+  ThemeData myTheme;
+
   int soloDuoWins = 30;
   int soloDuoLosses = 35;
   String soloDuoDivision = "Diamond 3";
@@ -64,46 +70,104 @@ class _UserScreen extends State<UserScreen> {
 
   List<Color> items = List<Color>();
 
-  Widget getGamesStatsText(String queueType, int wins, int losses,
-      [String division = "", exampleDivisionIconLink = null]) {
-    double ratio = roundDouble(wins / (wins + losses) * 100, 2);
+  Image mostPopularChampImage;
 
-    Widget divisionIcon;
-    if (exampleDivisionIconLink != null) {
-      divisionIcon = Image.network(exampleDivisionIconLink);
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      items.addAll(_colorsList.getRange(present, present + perPage));
+      present = present + perPage;
+    });
+  }
+
+  void loadMore() {
+    setState(() {
+//      log("_colorsList.length: " + _colorsList.length.toString());
+//      log("present: " + present.toString());
+//      log("perPage: " + perPage.toString());
+//      if ((present + perPage) > _colorsList.length) {
+//        log("11");
+//        items.addAll(_colorsList.getRange(present, _colorsList.length - 1));
+//      } else {
+//        log("22");
+//        items.addAll(_colorsList.getRange(present, present + perPage));
+//      }
+//      present = present + perPage;
+//      if (present > _colorsList.length) {
+//        present = _colorsList.length - 1;
+//      }
+
+    if((present + perPage )> _colorsList.length) {
+      items.addAll(
+          _colorsList.getRange(present, _colorsList.length));
     } else {
-      divisionIcon = Container(
-        width: 0,
-        height: 0,
-      );
+      items.addAll(
+          _colorsList.getRange(present, present + perPage));
     }
-    return Expanded(
-      child: Row(children: [
-        RichText(
-          text: TextSpan(
-              text: queueType,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                fontSize: 15,
-              ),
-              children: [
-                TextSpan(
-                    text: "$soloDuoWins/$soloDuoLosses ($ratio%) " + division,
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                    )),
-              ]),
-        ),
-        divisionIcon,
-      ]),
+    present = present + perPage;
+    });
+
+  }
+
+  Future<Image> _fetchNetworkData(String champImageURL) async {
+    Image image = await Image.network(
+        "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg",
+        fit: BoxFit.fill);
+    mostPopularChampImage = image;
+    return image;
+  }
+
+  Widget _buildTile(int index) {
+    return Card(
+      elevation: 5,
+      child: Container(
+          width: double.maxFinite, height: 100, color: _colorsList[index]),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    myTheme = Theme.of(context);
+
     String exampleDivisionIconLink =
         "https://vignette.wikia.nocookie.net/leagueoflegends/images/d/dc/Season_2019_-_Diamond_3.png/revision/latest/zoom-crop/width/90/height/55?cb=20181229234918";
+
+    Widget getGamesStatsText(String queueType, int wins, int losses,
+        [String division = "", exampleDivisionIconLink = null]) {
+      double ratio = roundDouble(wins / (wins + losses) * 100, 2);
+
+      Widget divisionIcon;
+      if (exampleDivisionIconLink != null) {
+        divisionIcon = Image.network(exampleDivisionIconLink);
+      } else {
+        divisionIcon = Container(
+          width: 0,
+          height: 0,
+        );
+      }
+      return Expanded(
+        child: Row(children: [
+          RichText(
+            text: TextSpan(
+                text: queueType,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 15,
+                ),
+                children: [
+                  TextSpan(
+                      text: "$wins/$losses ($ratio%) " + division,
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                      )),
+                ]),
+          ),
+          divisionIcon,
+        ]),
+      );
+    }
 
     Widget topRowOfMainInfoSection = Expanded(
       flex: 1,
@@ -186,10 +250,7 @@ class _UserScreen extends State<UserScreen> {
           children: <Widget>[
             Opacity(
               opacity: 0.6,
-              child: Image.network(
-                'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg',
-                fit: BoxFit.fill,
-              ),
+              child: mostPopularChampImage,
             ),
             Container(
               child: Column(
@@ -205,87 +266,90 @@ class _UserScreen extends State<UserScreen> {
       ),
     );
 
-    void loadMore() {
-      setState(() {
-        if ((present + perPage) > _colorsList.length) {
-          items.addAll(_colorsList.getRange(present, _colorsList.length - 1));
-        } else {
-          items.addAll(_colorsList.getRange(present, present + perPage));
-        }
-        present = present + perPage;
-        if (present > _colorsList.length) {
-          present = _colorsList.length - 1;
-        }
-      });
-    }
+//    SliverList(
+//      delegate: SliverChildBuilderDelegate(
+//            (context, index) => _buildTile(index),
+//        childCount: (present <= _colorsList.length)
+//            ? items.length + 1
+//            : items.length,
+//      ),
+//    ),
 
-//    Widget _buildTile(BuildContext context, int index) {
-//      return (index == items.length)
-//          ? Container(
-//        color: Colors.greenAccent,
-//        child: FlatButton(
-//          child: Text("Load More"),
-//          onPressed: () => loadMore(),
-//        ),
-//      )
-//          : Container(
-//          width: double.maxFinite, height: 100, color: _colorsList[index]);
-//    }
-
-    Widget _buildTile(BuildContext context, int index) {
-      return Card(
-        elevation: 5,
-        child: Container(
-            width: double.maxFinite, height: 100, color: _colorsList[index]),
-      );
-    }
-
-    return Scaffold(
-      body: NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification scrollInfo) {
-          if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-            loadMore();
-          }
-        },
-        child: CustomScrollView(
-          slivers: [
-            BaseAppBar.getBaseSliverAppBar(context),
-            SliverToBoxAdapter(
-              child: mainInfoSection,
-            ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => _buildTile(context, index),
-                childCount: (present <= _colorsList.length)
-                    ? items.length + 1
-                    : items.length,
+    Widget secondPart = DefaultTabController(
+      length: 2,
+      child: Container(
+        color: myTheme.primaryColor,
+        child: Column(children: [
+          TabBar(
+            labelColor: myTheme.accentColor,
+            tabs: <Widget>[
+              Tab(
+                text: "Match History",
               ),
+              Tab(
+                text: "Statistics",
+              ),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              children: <Widget>[
+                ListView.builder(
+                  itemBuilder: (context, index) => _buildTile(index),
+                  itemCount:
+//                    _colorsList.length,
+                  (present <= _colorsList.length)
+                      ? items.length + 1
+                      : items.length,
+                ),
+                Icon(Icons.directions_transit),
+              ],
             ),
-          ],
-        ),
+          )
+        ]),
       ),
     );
 
-//    return SafeArea(
-//        child: Scaffold(
-//            appBar: BaseAppBar.getBaseAppBar(context),
-//            body: Container(
-//              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-//              child: Column(
-//                children: <Widget>[
-//                  mainInfoSection,
-//                  matchHistory(),
-//                ],
-//              ),
-//            )));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    setState(() {
-      items.addAll(_colorsList.getRange(present, present + perPage));
-      present = present + perPage;
-    });
+    return FutureBuilder(
+      future:
+//      Future.delayed(Duration(seconds: 2)),
+          _fetchNetworkData(
+              "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg"),
+      // todo
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          log("DONE");
+          return Scaffold(
+            appBar: BaseAppBar.getBaseAppBar(context),
+            body: NotificationListener<ScrollNotification>(
+                onNotification: (ScrollNotification scrollInfo) {
+                  if (scrollInfo.metrics.pixels ==
+                      scrollInfo.metrics.maxScrollExtent) {
+                    loadMore();
+                  }
+                },
+                child: Column(
+                  children: <Widget>[
+                    mainInfoSection,
+                    Expanded(
+                      child: secondPart,
+                    ),
+                  ],
+                )),
+          );
+        } else {
+          log("NIE DONE");
+          return Container(
+            color: Colors.white,
+            child: Center(
+              child: CircularProgressIndicator(
+                backgroundColor: myTheme.accentColor,
+                valueColor: AlwaysStoppedAnimation<Color>(myTheme.primaryColor),
+              ),
+            ),
+          );
+        }
+      },
+    );
   }
 }
