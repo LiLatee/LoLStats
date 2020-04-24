@@ -6,7 +6,10 @@ import 'package:lolstats/common/themes.dart';
 import 'file:///D:/Dokumenty/Projekty/AndroidStudioProjects/lol_stats/lib/common/util.dart';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
+import 'package:lolstats/models/Champion.dart';
 import 'dart:convert';
+
+import 'package:lolstats/models/Game.dart';
 
 class UserScreen extends StatefulWidget {
   @override
@@ -27,102 +30,94 @@ class _UserScreen extends State<UserScreen> {
   int normalWins = 300;
   int normalLosses = 350;
 
-  List<Color> _colorsList = [
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.green,
+  Image  mostPopularChampImage = Image.network(
+      "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg",
+      fit: BoxFit.fill);
+
+  List<Game> _games = [
+    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+    Game(Champion("Sejuani"), false,  {"kills":5,"deaths":1,"assists":3}, 23, 55),
+    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
   ];
+
   int perPage = 10;
   int present = 0;
 
-  List<Color> items = List<Color>();
+  List<Game> items = List<Game>();
 
-  Image mostPopularChampImage;
+
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      items.addAll(_colorsList.getRange(present, present + perPage));
+      items.addAll(_games.getRange(present, present + perPage));
       present = present + perPage;
     });
   }
 
   void loadMore() {
     setState(() {
-//      log("_colorsList.length: " + _colorsList.length.toString());
+//      log("_games.length: " + _games.length.toString());
 //      log("present: " + present.toString());
 //      log("perPage: " + perPage.toString());
-//      if ((present + perPage) > _colorsList.length) {
-//        log("11");
-//        items.addAll(_colorsList.getRange(present, _colorsList.length - 1));
-//      } else {
-//        log("22");
-//        items.addAll(_colorsList.getRange(present, present + perPage));
-//      }
-//      present = present + perPage;
-//      if (present > _colorsList.length) {
-//        present = _colorsList.length - 1;
-//      }
+    // todo wywala się, jak jest równo lub mniej elementów co perPage
+      if ((present + perPage) > _games.length) {
+        items.addAll(_games.getRange(present, _games.length - 1));
+      } else {
+        items.addAll(_games.getRange(present, present + perPage));
+      }
+      present = present + perPage;
+      if (present > _games.length) {
+        present = _games.length - 1;
+      }
 
-    if((present + perPage )> _colorsList.length) {
-      items.addAll(
-          _colorsList.getRange(present, _colorsList.length));
-    } else {
-      items.addAll(
-          _colorsList.getRange(present, present + perPage));
-    }
-    present = present + perPage;
     });
 
   }
 
-  Future<Image> _fetchNetworkData(String champImageURL) async {
+  void _fetchNetworkData(String champImageURL) async {
     Image image = await Image.network(
         "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg",
-        fit: BoxFit.fill);
+        fit: BoxFit.fill,);
     mostPopularChampImage = image;
-    return image;
   }
 
   Widget _buildTile(int index) {
+    Game game = _games[index];
+    Color color = game.isWin ? Colors.green : Colors.red;
+    String gameResult = (game.isWin) ? "Win": "Lose";
+    String imageURL = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/" + game.champion.name + "_0.jpg";
+//    String imageURL = "https://vignette.wikia.nocookie.net/leagueoflegends/images/8/8f/Arcade_Star_profileicon.png/revision/latest/scale-to-width-down/48?cb=20190802024813";
+    Image image = Image.network(imageURL, fit: BoxFit.fill,);
+    
     return Card(
       elevation: 5,
       child: Container(
-          width: double.maxFinite, height: 100, color: _colorsList[index]),
+          color: color,
+        child: ListTile(
+          leading: image,
+          title: Text(game.KDA['kills'].toString() + "/" + game.KDA['deaths'].toString() + "/" +game.KDA['assists'].toString()),
+          subtitle: Text(game.minutes.toString() + ":" + game.seconds.toString()),
+          trailing: Text(gameResult, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),) ,
+        ),
+      ),
     );
   }
 
@@ -242,9 +237,10 @@ class _UserScreen extends State<UserScreen> {
       ),
     );
     Widget mainInfoSection = Container(
+      color: baseTheme.primaryColor,
       height: 220,
       child: Card(
-        elevation: 5,
+//        elevation: 5,
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
@@ -269,7 +265,7 @@ class _UserScreen extends State<UserScreen> {
 //    SliverList(
 //      delegate: SliverChildBuilderDelegate(
 //            (context, index) => _buildTile(index),
-//        childCount: (present <= _colorsList.length)
+//        childCount: (present <= _games.length)
 //            ? items.length + 1
 //            : items.length,
 //      ),
@@ -297,8 +293,8 @@ class _UserScreen extends State<UserScreen> {
                 ListView.builder(
                   itemBuilder: (context, index) => _buildTile(index),
                   itemCount:
-//                    _colorsList.length,
-                  (present <= _colorsList.length)
+//                    _games.length,
+                  (present <= _games.length)
                       ? items.length + 1
                       : items.length,
                 ),
@@ -310,15 +306,15 @@ class _UserScreen extends State<UserScreen> {
       ),
     );
 
-    return FutureBuilder(
-      future:
-//      Future.delayed(Duration(seconds: 2)),
-          _fetchNetworkData(
-              "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg"),
-      // todo
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          log("DONE");
+//    return FutureBuilder(
+//      future:
+////      Future.delayed(Duration(seconds: 2)),
+//          _fetchNetworkData(
+//              "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg"),
+//      // todo
+//      builder: (BuildContext context, AsyncSnapshot snapshot) {
+//        if (snapshot.connectionState == ConnectionState.done) {
+//          log("DONE");
           return Scaffold(
             appBar: BaseAppBar.getBaseAppBar(context),
             body: NotificationListener<ScrollNotification>(
@@ -337,19 +333,19 @@ class _UserScreen extends State<UserScreen> {
                   ],
                 )),
           );
-        } else {
-          log("NIE DONE");
-          return Container(
-            color: Colors.white,
-            child: Center(
-              child: CircularProgressIndicator(
-                backgroundColor: myTheme.accentColor,
-                valueColor: AlwaysStoppedAnimation<Color>(myTheme.primaryColor),
-              ),
-            ),
-          );
-        }
-      },
-    );
+//        } else {
+//          log("NIE DONE");
+//          return Container(
+//            color: Colors.white,
+//            child: Center(
+//              child: CircularProgressIndicator(
+//                backgroundColor: myTheme.accentColor,
+//                valueColor: AlwaysStoppedAnimation<Color>(myTheme.primaryColor),
+//              ),
+//            ),
+//          );
+//        }
+//      },
+//    );
   }
 }
