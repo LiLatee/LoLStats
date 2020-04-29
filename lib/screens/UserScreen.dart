@@ -10,6 +10,7 @@ import 'package:lolstats/models/Champion.dart';
 import 'dart:convert';
 
 import 'package:lolstats/models/Game.dart';
+import '../common/TextStyles.dart' as MyTextStyles;
 
 class UserScreen extends StatefulWidget {
   @override
@@ -18,7 +19,6 @@ class UserScreen extends StatefulWidget {
 
 class _UserScreen extends State<UserScreen> {
   ThemeData myTheme;
-
   int soloDuoWins = 30;
   int soloDuoLosses = 35;
   String soloDuoDivision = "Diamond 3";
@@ -30,37 +30,56 @@ class _UserScreen extends State<UserScreen> {
   int normalWins = 300;
   int normalLosses = 350;
 
-  Image  mostPopularChampImage = Image.network(
+  Image mostPopularChampImage = Image.network(
       "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg",
       fit: BoxFit.fill);
 
   List<Game> _games = [
-    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-    Game(Champion("Sejuani"), false,  {"kills":5,"deaths":1,"assists":3}, 23, 55),
-    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
-//    Game(Champion("Zed"), true, {"kills":5,"deaths":1,"assists":3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Sejuani"), false, {"kills": 5, "deaths": 1, "assists": 3}, 23,
+        55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(
+        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
   ];
 
   int perPage = 10;
   int present = 0;
 
   List<Game> items = List<Game>();
-
 
 
   @override
@@ -77,45 +96,99 @@ class _UserScreen extends State<UserScreen> {
 //      log("_games.length: " + _games.length.toString());
 //      log("present: " + present.toString());
 //      log("perPage: " + perPage.toString());
-    // todo wywala się, jak jest równo lub mniej elementów co perPage
+      // todo wywala się, jak jest równo lub mniej elementów co perPage
       if ((present + perPage) > _games.length) {
+//        log("111");
         items.addAll(_games.getRange(present, _games.length - 1));
       } else {
+//        log("222");
         items.addAll(_games.getRange(present, present + perPage));
       }
       present = present + perPage;
       if (present > _games.length) {
         present = _games.length - 1;
       }
-
     });
-
   }
 
   void _fetchNetworkData(String champImageURL) async {
     Image image = await Image.network(
-        "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg",
-        fit: BoxFit.fill,);
+      "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg",
+      fit: BoxFit.fill,);
     mostPopularChampImage = image;
   }
 
   Widget _buildTile(int index) {
     Game game = _games[index];
-    Color color = game.isWin ? Colors.green : Colors.red;
-    String gameResult = (game.isWin) ? "Win": "Lose";
-    String imageURL = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/" + game.champion.name + "_0.jpg";
+    Color color = game.isWin ? Colors.green[400] : Colors.red[400];
+    String gameResult = (game.isWin) ? "Win" : "Lose";
+    String imageURL = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/" +
+        game.champion.name + "_0.jpg";
 //    String imageURL = "https://vignette.wikia.nocookie.net/leagueoflegends/images/8/8f/Arcade_Star_profileicon.png/revision/latest/scale-to-width-down/48?cb=20190802024813";
-    Image image = Image.network(imageURL, fit: BoxFit.fill,);
-    
+    Image image = Image.network(imageURL, fit: BoxFit.fitWidth,);
+
+//    return Container(
+//      height: 100,
+////      color: color,
+//      child: Card(
+//        color: color,
+//        elevation: 5,
+//        child: Stack(
+//            fit: StackFit.expand,
+//            children: [
+//              Opacity(
+//                opacity: 0.6,
+//                child: Container(
+//                  decoration: BoxDecoration(
+//                    image: DecorationImage(fit: BoxFit.fitWidth,
+//                        alignment: FractionalOffset.topCenter,
+//                        image: NetworkImage(imageURL)),
+//                  ),
+//                ),
+//              ),
+//              Opacity(
+//                opacity: 0.3,
+//                child: Container(
+//                  color: Colors.white,
+//                ),
+//              ),
+//        ListTile(
+//          title: Text(game.KDA['kills'].toString() +
+//              "/" +
+//              game.KDA['deaths'].toString() +
+//              "/" +
+//              game.KDA['assists'].toString()),
+//          subtitle:
+//          Text(game.minutes.toString() + ":" + game.seconds.toString()),
+//          leading: Container(
+//            width: 50,
+//            child: Text(
+//              gameResult,
+//              overflow: TextOverflow.ellipsis,
+//              softWrap: false,
+//              style: MyTextStyles.gameResult,
+//
+//            ),
+//          ),
+//        ),
+//            ]),
+//      ),
+//    );
+
+
     return Card(
       elevation: 5,
       child: Container(
-          color: color,
+        color: color,
         child: ListTile(
           leading: image,
-          title: Text(game.KDA['kills'].toString() + "/" + game.KDA['deaths'].toString() + "/" +game.KDA['assists'].toString()),
-          subtitle: Text(game.minutes.toString() + ":" + game.seconds.toString()),
-          trailing: Text(gameResult, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),) ,
+          title: Text(game.KDA['kills'].toString() + "/" +
+              game.KDA['deaths'].toString() + "/" +
+              game.KDA['assists'].toString()),
+          subtitle: Text(
+              game.minutes.toString() + ":" + game.seconds.toString()),
+          trailing: Text(gameResult,
+            style: MyTextStyles.gameResult,),
         ),
       ),
     );
@@ -146,11 +219,7 @@ class _UserScreen extends State<UserScreen> {
           RichText(
             text: TextSpan(
                 text: queueType,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 15,
-                ),
+                style: MyTextStyles.queueType,
                 children: [
                   TextSpan(
                       text: "$wins/$losses ($ratio%) " + division,
@@ -184,28 +253,7 @@ class _UserScreen extends State<UserScreen> {
                 child: Text(
                   "Nickname",
                   softWrap: true,
-                  style: TextStyle(
-                    shadows: [
-                      Shadow(
-                          // bottomLeft
-                          offset: Offset(-1, -1),
-                          color: Colors.white),
-                      Shadow(
-                          // bottomRight
-                          offset: Offset(1, -1),
-                          color: Colors.white),
-                      Shadow(
-                          // topRight
-                          offset: Offset(1, 1),
-                          color: Colors.white),
-                      Shadow(
-                          // topLeft
-                          offset: Offset(-1, 1),
-                          color: Colors.white),
-                    ],
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: MyTextStyles.nickname,
                 ),
               ),
             ),
@@ -315,24 +363,24 @@ class _UserScreen extends State<UserScreen> {
 //      builder: (BuildContext context, AsyncSnapshot snapshot) {
 //        if (snapshot.connectionState == ConnectionState.done) {
 //          log("DONE");
-          return Scaffold(
-            appBar: BaseAppBar.getBaseAppBar(context),
-            body: NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification scrollInfo) {
-                  if (scrollInfo.metrics.pixels ==
-                      scrollInfo.metrics.maxScrollExtent) {
-                    loadMore();
-                  }
-                },
-                child: Column(
-                  children: <Widget>[
-                    mainInfoSection,
-                    Expanded(
-                      child: secondPart,
-                    ),
-                  ],
-                )),
-          );
+    return Scaffold(
+      appBar: BaseAppBar.getBaseAppBar(context),
+      body: NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification scrollInfo) {
+            if (scrollInfo.metrics.pixels ==
+                scrollInfo.metrics.maxScrollExtent) {
+              loadMore();
+            }
+          },
+          child: Column(
+            children: <Widget>[
+              mainInfoSection,
+              Expanded(
+                child: secondPart,
+              ),
+            ],
+          )),
+    );
 //        } else {
 //          log("NIE DONE");
 //          return Container(
