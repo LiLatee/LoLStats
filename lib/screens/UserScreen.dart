@@ -1,15 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lolstats/common/themes.dart';
-import 'file:///D:/Dokumenty/Projekty/AndroidStudioProjects/lol_stats/lib/common/BaseAppBar.dart';
-import 'package:lolstats/common/themes.dart';
+import 'file:///D:/Dokumenty/Projekty/AndroidStudioProjects/lol_stats/lib/common/AppBars.dart' as AppBars;
 import 'file:///D:/Dokumenty/Projekty/AndroidStudioProjects/lol_stats/lib/common/util.dart';
-import 'dart:developer';
-import 'package:http/http.dart' as http;
 import 'package:lolstats/models/Champion.dart';
-import 'dart:convert';
 
 import 'package:lolstats/models/Game.dart';
+import 'package:lolstats/models/KDA.dart';
+import 'package:lolstats/screens/GameStatsScreen.dart';
 import '../common/TextStyles.dart' as MyTextStyles;
 
 class UserScreen extends StatefulWidget {
@@ -35,52 +33,37 @@ class _UserScreen extends State<UserScreen> {
       fit: BoxFit.fill);
 
   List<Game> _games = [
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Sejuani"), false, {"kills": 5, "deaths": 1, "assists": 3}, 23,
-        55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
-    Game(
-        Champion("Zed"), true, {"kills": 5, "deaths": 1, "assists": 3}, 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Sejuani"), false, KDA(5, 1, 3), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
+    Game(Champion("Zed"), true, KDA(3, 1, 5), 23, 55),
   ];
 
   int perPage = 10;
   int present = 0;
 
   List<Game> items = List<Game>();
-
 
   @override
   void initState() {
@@ -114,7 +97,8 @@ class _UserScreen extends State<UserScreen> {
   void _fetchNetworkData(String champImageURL) async {
     Image image = await Image.network(
       "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg",
-      fit: BoxFit.fill,);
+      fit: BoxFit.fill,
+    );
     mostPopularChampImage = image;
   }
 
@@ -122,10 +106,15 @@ class _UserScreen extends State<UserScreen> {
     Game game = _games[index];
     Color color = game.isWin ? Colors.green[400] : Colors.red[400];
     String gameResult = (game.isWin) ? "Win" : "Lose";
-    String imageURL = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/" +
-        game.champion.name + "_0.jpg";
+    String imageURL =
+        "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/" +
+            game.champion.name +
+            "_0.jpg";
 //    String imageURL = "https://vignette.wikia.nocookie.net/leagueoflegends/images/8/8f/Arcade_Star_profileicon.png/revision/latest/scale-to-width-down/48?cb=20190802024813";
-    Image image = Image.network(imageURL, fit: BoxFit.fitWidth,);
+    Image image = Image.network(
+      imageURL,
+      fit: BoxFit.fitWidth,
+    );
 
 //    return Container(
 //      height: 100,
@@ -175,20 +164,23 @@ class _UserScreen extends State<UserScreen> {
 //      ),
 //    );
 
-
-    return Card(
-      elevation: 5,
-      child: Container(
-        color: color,
-        child: ListTile(
-          leading: image,
-          title: Text(game.KDA['kills'].toString() + "/" +
-              game.KDA['deaths'].toString() + "/" +
-              game.KDA['assists'].toString()),
-          subtitle: Text(
-              game.minutes.toString() + ":" + game.seconds.toString()),
-          trailing: Text(gameResult,
-            style: MyTextStyles.gameResult,),
+    return GestureDetector(
+      onTap: () => Navigator.push(
+          context, MaterialPageRoute(builder: (context) => GameStatsScreen())),
+      child: Card(
+        elevation: 5,
+        child: Container(
+          color: color,
+          child: ListTile(
+            leading: image,
+            title: Text(game.kda.toString()),
+            subtitle:
+                Text(game.minutes.toString() + ":" + game.seconds.toString()),
+            trailing: Text(
+              gameResult,
+              style: MyTextStyles.gameResult,
+            ),
+          ),
         ),
       ),
     );
@@ -319,6 +311,13 @@ class _UserScreen extends State<UserScreen> {
 //      ),
 //    ),
 
+    Widget gamesList = ListView.builder(
+      itemBuilder: (context, index) => _buildTile(index),
+      itemCount:
+//                    _games.length,
+          (present <= _games.length) ? items.length + 1 : items.length,
+    );
+
     Widget secondPart = DefaultTabController(
       length: 2,
       child: Container(
@@ -338,15 +337,8 @@ class _UserScreen extends State<UserScreen> {
           Expanded(
             child: TabBarView(
               children: <Widget>[
-                ListView.builder(
-                  itemBuilder: (context, index) => _buildTile(index),
-                  itemCount:
-//                    _games.length,
-                  (present <= _games.length)
-                      ? items.length + 1
-                      : items.length,
-                ),
-                Icon(Icons.directions_transit),
+                gamesList,
+                GameStatsScreen(),
               ],
             ),
           )
@@ -363,8 +355,9 @@ class _UserScreen extends State<UserScreen> {
 //      builder: (BuildContext context, AsyncSnapshot snapshot) {
 //        if (snapshot.connectionState == ConnectionState.done) {
 //          log("DONE");
+
     return Scaffold(
-      appBar: BaseAppBar.getBaseAppBar(context),
+      appBar: AppBars.baseAppBar(context),
       body: NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
             if (scrollInfo.metrics.pixels ==
@@ -381,19 +374,5 @@ class _UserScreen extends State<UserScreen> {
             ],
           )),
     );
-//        } else {
-//          log("NIE DONE");
-//          return Container(
-//            color: Colors.white,
-//            child: Center(
-//              child: CircularProgressIndicator(
-//                backgroundColor: myTheme.accentColor,
-//                valueColor: AlwaysStoppedAnimation<Color>(myTheme.primaryColor),
-//              ),
-//            ),
-//          );
-//        }
-//      },
-//    );
   }
 }

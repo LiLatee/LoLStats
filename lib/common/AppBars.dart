@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../common/themes.dart';
 
-class BaseAppBar {
-  static AppBar getBaseAppBar(BuildContext context) {
+AppBar baseAppBar(BuildContext context) {
     return AppBar(
       title: Text("LolStats"),
       actions: <Widget>[
@@ -23,7 +22,7 @@ class BaseAppBar {
     );
   }
 
-  static SliverAppBar getBaseSliverAppBar(BuildContext context) {
+  SliverAppBar baseSliverAppBar(BuildContext context) {
     return SliverAppBar(
       title: Text("LolStats"),
       pinned: true,
@@ -44,7 +43,7 @@ class BaseAppBar {
       ],
     );
   }
-}
+
 
 class CustomSearchDelegate extends SearchDelegate {
   @override

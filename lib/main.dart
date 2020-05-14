@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lolstats/common/themes.dart';
-import 'file:///D:/Dokumenty/Projekty/AndroidStudioProjects/lol_stats/lib/common/BaseAppBar.dart';
+import 'file:///D:/Dokumenty/Projekty/AndroidStudioProjects/lol_stats/lib/common/AppBars.dart' as AppBars;
 import 'package:lolstats/screens/UserScreen.dart';
 import 'common/themes.dart';
 void main() => runApp(MyApp());
@@ -96,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: BaseAppBar.getBaseAppBar(context),
+      appBar: AppBars.baseAppBar(context),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: bottomSelectedIndex,
         onTap: (index) {

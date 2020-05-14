@@ -1,18 +1,19 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:lolstats/models/Champion.dart';
+import 'package:lolstats/models/KDA.dart';
 
 class Game {
   Champion _champion;
   bool _isWin;
-  Map _KDA;
+  KDA _kda;
   int _minutes;
   int _seconds;
 
-  Game(Champion champion, bool isWin, Map KDA, int minutes, int seconds){
+  Game(Champion champion, bool isWin, KDA kda, int minutes, int seconds){
     this._champion = champion;
     this._isWin = isWin;
-    this._KDA = KDA;
+    this._kda = kda;
     this._minutes = minutes;
     this._seconds = seconds;
   }
@@ -29,10 +30,10 @@ class Game {
     _minutes = value;
   }
 
-  Map get KDA => _KDA;
+  KDA get kda => _kda;
 
-  set KDA(Map value) {
-    _KDA = value;
+  set kda(KDA kda){
+    _kda = kda;
   }
 
   bool get isWin => _isWin;
