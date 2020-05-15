@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lolstats/common/CustomWidgets.dart' as CustomWidgets;
+import 'package:lolstats/common/themes.dart';
 import 'package:lolstats/models/KDA.dart';
 import 'package:lolstats/common/AppColors.dart' as AppColors;
 import 'package:lolstats/common/AppBars.dart' as AppBars;
@@ -11,32 +13,40 @@ class GameStatsScreen extends StatefulWidget {
 }
 
 class _GameStatsScreenState extends State<GameStatsScreen> {
-
   bool sort;
   List<PlayerGameStats> playersList;
   NetworkImage asheIcon;
+
   @override
   void initState() {
-    asheIcon = NetworkImage('https://gamepedia.cursecdn.com/lolesports_gamepedia_en/4/4a/AsheSquare.png');
+    asheIcon = NetworkImage(
+        'https://gamepedia.cursecdn.com/lolesports_gamepedia_en/4/4a/AsheSquare.png');
     sort = false;
     playersList = [
-      PlayerGameStats(KDA(5, 2, 8), 3003, 123134, 345, 123, 999, asheIcon),
-      PlayerGameStats(KDA(5, 2, 8), 4000, 123134, 345, 123, 888, asheIcon),
-      PlayerGameStats(KDA(5, 2, 8), 222, 123134, 345, 123, 999,  asheIcon),
-      PlayerGameStats(KDA(5, 2, 8), 3003, 123134, 345, 123, 444, asheIcon),
-      PlayerGameStats(KDA(5, 2, 8), 3003, 123134, 345, 123, 666, asheIcon)
+      PlayerGameStats(KDA(5, 2, 8), 3003, 123134, 345, 123, 999, asheIcon, true),
+      PlayerGameStats(KDA(5, 2, 8), 4000, 123134, 345, 123, 888, asheIcon, true),
+      PlayerGameStats(KDA(5, 2, 8), 222, 123134, 345, 123, 999, asheIcon, true),
+      PlayerGameStats(KDA(5, 2, 8), 3003, 123134, 345, 123, 444, asheIcon, true),
+      PlayerGameStats(KDA(5, 2, 8), 3003, 123134, 345, 123, 666, asheIcon, true),
+      PlayerGameStats(KDA(5, 2, 8), 3003, 123134, 345, 123, 999, asheIcon, false),
+      PlayerGameStats(KDA(5, 2, 8), 4000, 123134, 345, 123, 888, asheIcon, false),
+      PlayerGameStats(KDA(5, 2, 8), 222, 123134, 345, 123, 999, asheIcon, false),
+      PlayerGameStats(KDA(5, 2, 8), 3003, 123134, 345, 123, 444, asheIcon, false),
+      PlayerGameStats(KDA(5, 2, 8), 3003, 123134, 345, 123, 666, asheIcon, false)
     ];
     super.initState();
   }
 
-
-
   void onSortColumn(int columnIndex, bool ascending, String columnName) {
-      if (ascending) {
-        playersList.sort((a, b) => a.getAttributeByName(columnName).compareTo(b.getAttributeByName(columnName)));
-      } else {
-        playersList.sort((a, b) => b.getAttributeByName(columnName).compareTo(a.getAttributeByName(columnName)));
-      }
+    if (ascending) {
+      playersList.sort((a, b) => a
+          .getAttributeByName(columnName)
+          .compareTo(b.getAttributeByName(columnName)));
+    } else {
+      playersList.sort((a, b) => b
+          .getAttributeByName(columnName)
+          .compareTo(a.getAttributeByName(columnName)));
+    }
   }
 
   @override
@@ -160,6 +170,7 @@ class _GameStatsScreenState extends State<GameStatsScreen> {
         ),
       );
     }
+
     Widget blueTeamTable = Container(
       color: AppColors.blueTeamColor,
       child: Column(
@@ -225,87 +236,158 @@ class _GameStatsScreenState extends State<GameStatsScreen> {
       ),
     );
 
+    Widget getGameStatsTable() {
+      DataCell getDataCell(Widget child, {int index}) {
+        return DataCell(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  width: 20,
+                    color: index < 5 ? AppColors.blueTeamColor : AppColors.redTeamColor,
+                    child: Align(
+                      child: child,
+                      alignment: Alignment.center,
+                    )),
+              ),
+            ],
+          ),
+        );
+      }
 
-
-
-
-
-    Widget gameStatsTable = Container(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          columnSpacing: 2.0,
-          columns: [
-            DataColumn(
-              label: Text(''),
-              numeric: false,
+      DataColumn getDataColumn(String columnName, {isAvatar=false}) {
+        return DataColumn(
+            label: Container(
+              width: isAvatar ? CHAMP_AVATAR_SIZE*1.5 : 55,
+              child: Text(columnName,
+                softWrap: true,
+                style: Theme.of(context).textTheme.headline4,),
             ),
-            DataColumn(
-              label: Text('Gold Earned'),
-              numeric: true,
-            ),
-            DataColumn(
-              label: Text('Vision Score'),
-              numeric: true,
-            ),
-            DataColumn(
-              label: Text('Damage Dealt'),
-              numeric: true,
-            ),
-            DataColumn(
-              label: Text('Damage Taken'),
-              numeric: true,
+            numeric: true);
+      }
 
-            ),
-            DataColumn(
-              label: Text('Damage Healed'),
-              numeric: true,
+      Widget gameStatsTable = Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            CustomWidgets.getNewSectionText(context, "Statistics - Table"),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                color: baseTheme.primaryColor,
+                child: DataTable(
+                  headingRowHeight: 50.0,
+                  horizontalMargin: 0.0,
+                  columnSpacing: 0.0,
+                  columns: [
+                    getDataColumn('', isAvatar: true),
+                    getDataColumn('Gold Earned'),
+                    getDataColumn('Vision Score'),
+                    getDataColumn('Damage Dealt'),
+                    getDataColumn('Damage Taken'),
+                    getDataColumn('Damage Healed'),
+                  ],
+                  rows: playersList
+                      .map(
+                        (player) => DataRow(
+                          cells: [
+                            getDataCell(Container(
+                              padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
+                              child: CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    'https://gamepedia.cursecdn.com/lolesports_gamepedia_en/4/4a/AsheSquare.png'),
+                                radius: CHAMP_AVATAR_SIZE,
+                              ),
+                            ), index: playersList.indexOf(player)),
+                            getDataCell(Text(player.goldEarned.toString()), index: playersList.indexOf(player)),
+                            getDataCell(Text(player.visionScore.toString()), index: playersList.indexOf(player)),
+                            getDataCell(Text(player.damageDealt.toString()), index: playersList.indexOf(player)),
+                            getDataCell(Text(player.damageTaken.toString()), index: playersList.indexOf(player)),
+                            getDataCell(Text(player.damageHealed.toString()), index: playersList.indexOf(player)),
+                          ],
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
             ),
           ],
-          rows: playersList.map((player) =>
-              DataRow(
-                cells: [
-                  DataCell(
-                    CircleAvatar(backgroundImage:               NetworkImage(
-                        'https://gamepedia.cursecdn.com/lolesports_gamepedia_en/4/4a/AsheSquare.png'), radius: CHAMP_AVATAR_SIZE,),
-                  ),
-                  DataCell(
-                    Text(player.goldEarned.toString()),
-                  ),
-                  DataCell(
-                    Text(player.visionScore.toString()),
-                  ),
-                  DataCell(
-                    Text(player.damageDealt.toString()),
-                  ),
-                  DataCell(
-                    Text(player.damageTaken.toString()),
-                  ),
-                  DataCell(
-                    Text(player.damageHealed.toString()),
-                  ),
-                ],
-              ),).toList(),
         ),
-      ),
+      );
+      return gameStatsTable;
+    }
 
-    );
+    Widget getGameStatsTable2() {
+      List<Widget> _buildCells(int count) {
+        return List.generate(
+          count,
+          (index) => Container(
+            alignment: Alignment.center,
+//            width: 120.0,
+//            height: 60.0,
+            color: Colors.white,
+            margin: EdgeInsets.all(4.0),
+            child:
+                Text("${index + 1}", style: Theme.of(context).textTheme.title),
+          ),
+        );
+      }
+
+      List<Widget> _buildRows(int count) {
+        return List.generate(
+          count,
+          (index) => Row(
+            children: _buildCells(30),
+          ),
+        );
+      }
+
+      Widget getAvatar() => CircleAvatar(
+            backgroundImage: asheIcon,
+            radius: CHAMP_AVATAR_SIZE,
+          );
+
+      Widget gameStatsTable = SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: List.generate(
+                10,
+                (index) => getAvatar(),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: _buildRows(10),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      return gameStatsTable;
+    }
 
 
     return Scaffold(
       appBar: AppBars.baseAppBar(context),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: ListView(
-              children: <Widget>[
-                redTeamTable,
-                blueTeamTable,
-                gameStatsTable,
-              ],
-            ),
-          ),
-        ],
+      body: Container(
+        child: ListView(
+          children: <Widget>[
+            CustomWidgets.getNewSectionText(context, "Player Statistics"),
+            redTeamTable,
+            blueTeamTable,
+            getGameStatsTable(),
+          ],
+        ),
       ),
     );
   }

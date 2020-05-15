@@ -11,14 +11,21 @@ class PlayerGameStats
   int _damageTaken;
   int _damageHealed;
   NetworkImage _champIcon;
+  bool _isWin;
 
   PlayerGameStats(this.kda, this._goldEarned, this._visionScore,
-      this._damageDealt, this._damageTaken, this._damageHealed, this._champIcon);
+      this._damageDealt, this._damageTaken, this._damageHealed, this._champIcon, this._isWin);
 
   NetworkImage get champIcon => _champIcon;
 
   set champIcon(NetworkImage value) {
     _champIcon = value;
+  }
+
+  bool get isWin => _isWin;
+
+  set isWin(bool value) {
+    _isWin = value;
   }
 
   int getAttributeByName(String name) {

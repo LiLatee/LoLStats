@@ -30,3 +30,4 @@ TextStyle queueType = TextStyle(
   color: Colors.black,
   fontSize: 15,
 );
+
