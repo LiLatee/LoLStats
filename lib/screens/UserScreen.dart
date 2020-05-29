@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:lolstats/common/themes.dart';
 import 'package:lolstats/models/Champion.dart';
 
-import 'package:lolstats/models/Game.dart';
 import 'package:lolstats/models/KDA.dart';
 import 'package:lolstats/models/User.dart';
 import 'package:lolstats/screens/GameStatsScreen.dart';
@@ -12,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:developer';
 import 'package:lolstats/common/util.dart' as util;
+import 'package:lolstats/models/Game.dart';
 
 class UserScreen extends StatefulWidget {
   final String userName;
@@ -32,19 +32,19 @@ class _UserScreen extends State<UserScreen> {
   int normalWins = 300;
   int normalLosses = 350;
 
+  // TODO:
   Image mostPopularChampImage = util.getChampionSplash("Ashe");
 
   int perPage = 10;
   int present = 0;
 
-  Future<List<Album>> futureGames;
+  Future<List<Game>> futureGames;
   Future<User> futureUser;
-  List<Album> currentGames = List<Album>();
+  List<Game> currentGames = List<Game>();
 
   Future<User> fetchUser() async {
     final response = await http
         .get('http://192.168.1.68:5000/get_player_profile_info/${userName}');
-
 
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
@@ -56,19 +56,21 @@ class _UserScreen extends State<UserScreen> {
     }
   }
 
-  Future<List<Album>> fetchGames() async {
-    final response = await http.get('http://192.168.1.68:5000/');
+  Future<List<Game>> fetchGames({bool progressIndicator=false}) async {
+    final response = await http.get(
+        'http://192.168.1.68:5000/get_player_history_nick/$userName?n_games=$perPage&index_begin=$present');
 
+    log(response.statusCode.toString(), name: "MOJE_LOGI");
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
-      List<Album> games = jsonResponse
-          .map<Album>((jsonAlbum) => Album.fromJson(jsonAlbum))
+      List<Game> games = jsonResponse
+          .map<Game>((jsonGame) => Game.fromJson(jsonGame))
           .toList();
-//      log("TERAZ", name: "MOJE_LOGI");
-//      log(present.toString(), name: "MOJE_LOGI");
-//      log((present + perPage).toString(), name: "MOJE_LOGI");
 
-      currentGames.addAll(games.getRange(present, present + perPage));
+      if (progressIndicator) {
+        currentGames.remove(currentGames[currentGames.length-1]);
+      }
+      currentGames.addAll(games);
       log(currentGames.length.toString(), name: "MOJE_LOGI");
       present = present + perPage;
 
@@ -80,12 +82,29 @@ class _UserScreen extends State<UserScreen> {
     }
   }
 
+  ScrollController _controller;
+
+  _scrollListener() {
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      setState(() {
+        log("DOL", name: "MOJE_LOGI");
+        if (!(currentGames[currentGames.length-1].mainRune == -1) && !(currentGames[currentGames.length-1].secondRune == -1)) {
+          currentGames.add(Game.dummy());
+        }
+        futureGames = fetchGames(progressIndicator: true);
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     setState(() {
       futureGames = fetchGames();
       futureUser = fetchUser();
+      _controller = ScrollController();
+      _controller.addListener(_scrollListener);
     });
   }
 
@@ -95,11 +114,17 @@ class _UserScreen extends State<UserScreen> {
     });
   }
 
-  Widget _buildTile(Album game) {
-    bool isWin = true;
-    Color color = isWin ? Colors.green[400] : Colors.red[400];
-    String gameResult = (isWin) ? "Win" : "Lose";
-    Image image = util.getChampionAvatar("Zed");
+  Widget _buildTile(Game game) {
+    if (game.mainRune == -1 && game.secondRune == -1) {
+      return Container(
+          color: baseTheme.primaryColor,
+        alignment: Alignment.center,
+          child: CircularProgressIndicator());
+    }
+    Color color = game.isWin ? Colors.green[400] : Colors.red[400];
+    String gameResult = (game.isWin) ? "Win" : "Lose";
+    Image image = util.getChampionAvatar("Zed"); //TODO: champion id?
+
 
 //    return Container(
 //      height: 100,
@@ -150,19 +175,22 @@ class _UserScreen extends State<UserScreen> {
 //    );
 
     return GestureDetector(
-      onTap: () =>
-          Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => GameStatsScreen())),
+      onTap: () => Navigator.push(
+          context, MaterialPageRoute(builder: (context) => GameStatsScreen())),
       child: Card(
         elevation: 5,
         child: Container(
           color: color,
           child: ListTile(
             leading: image,
-            title: Text(game.name.toString()),
-            subtitle:
-            Text(game.lastname.toString() + ":" + game.lastname.toString()),
+            title: Text((game.KDA['kills'].toString() +
+                '/' +
+                game.KDA['deaths'].toString() +
+                '/' +
+                game.KDA['assists'].toString())),
+            subtitle: Text((game.gameDurationSecs ~/ 60).toString() +
+                ":" +
+                (game.gameDurationSecs % 60).toString().padLeft(2, '0')),
             trailing: Text(
               gameResult,
               style: MyTextStyles.gameResult,
@@ -213,8 +241,7 @@ class _UserScreen extends State<UserScreen> {
       );
     }
 
-    Widget getTopRowOfMainInfoSection(User user) =>
-        Expanded(
+    Widget getTopRowOfMainInfoSection(User user) => Expanded(
           flex: 1,
           child: Row(
             children: <Widget>[
@@ -240,8 +267,7 @@ class _UserScreen extends State<UserScreen> {
           ),
         );
 
-    Widget getBotRowOfMainInfoSection(User user) =>
-        Expanded(
+    Widget getBotRowOfMainInfoSection(User user) => Expanded(
           flex: 1,
           child: Row(
             children: <Widget>[
@@ -256,13 +282,17 @@ class _UserScreen extends State<UserScreen> {
                           user.queuesData[0].wins,
                           user.queuesData[0].losses,
                           // TODO: zastąpić 0 przez SOLO/DUO itd.
-                          user.queuesData[0].tier + " " + user.queuesData[0].rank,
+                          user.queuesData[0].tier +
+                              " " +
+                              user.queuesData[0].rank,
                           exampleDivisionIconLink),
                       getGamesStatsText(
                           "Flex: ",
                           user.queuesData[1].wins,
                           user.queuesData[1].losses,
-                          user.queuesData[1].tier + " " + user.queuesData[1].rank,
+                          user.queuesData[1].tier +
+                              " " +
+                              user.queuesData[1].rank,
                           exampleDivisionIconLink),
                       getGamesStatsText(
                           "Normal: ", normalWins, normalLosses, "", null),
@@ -276,8 +306,9 @@ class _UserScreen extends State<UserScreen> {
         );
 
     Widget mainInfoSection = Container(
-      color: baseTheme.primaryColor,
       height: 220,
+      alignment: Alignment.center,
+      color: baseTheme.primaryColor,
       child: FutureBuilder<User>(
         future: futureUser,
         builder: (context, snapshot) {
@@ -303,8 +334,7 @@ class _UserScreen extends State<UserScreen> {
                 ],
               ),
             );
-          }
-          else if (snapshot.hasError) {
+          } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
           return CircularProgressIndicator();
@@ -312,20 +342,58 @@ class _UserScreen extends State<UserScreen> {
       ),
     );
 
+//    Widget gamesList2 = Container(
+//      child: FutureBuilder<List<Album>>(
+//        future: futureGames2,
+//        builder: (context, snapshot) {
+//          if (currentGames2.length != 0) {
+//            return ListView.builder(
+//              itemBuilder: (context, index) => _buildTile2(currentGames2[index]),
+//              itemCount: currentGames2.length,
+//            );
+//          } else if (currentGames2.length == 0) {
+//            return Center(child: Container(child: Text("Empty")));
+//          } else if (snapshot.hasError) {
+//            return Center(child: Container(child: Text("Network Error")));
+//          }
+//
+//          return Center(child: Container(child: Text("unexpected")));
+////          else {
+////            if (currentGames.length != 0) {
+////              return ListView.builder(
+////                itemBuilder: (context, index) =>
+////                    _buildTile2(currentGames[index]),
+////                itemCount:
+////                currentGames.length,
+//////                  (present <= _games.length) ? items.length + 1 : items.length,
+////              );
+////            }
+////          };
+//        },
+//      ),
+//    );
+
     Widget gamesList = Container(
-      child: FutureBuilder<List<Album>>(
+      alignment: Alignment.center,
+      child: FutureBuilder<List<Game>>(
         future: futureGames,
         builder: (context, snapshot) {
-          if (currentGames.length != 0) {
-            return ListView.builder(
-              itemBuilder: (context, index) => _buildTile(currentGames[index]),
-              itemCount: currentGames.length,
-            );
-          } else if (currentGames.length == 0) {
-            return Center(child: Container(child: Text("Empty")));
-          } else if (snapshot.hasError) {
-            return Center(child: Container(child: Text("Network Error")));
-          }
+//          if (snapshot.connectionState != ConnectionState.done) {
+//            return CircularProgressIndicator();
+//          } else {
+            if (currentGames.length != 0) {
+              return ListView.builder(
+                controller: _controller,
+                itemBuilder: (context, index) =>
+                    _buildTile(currentGames[index]),
+                itemCount: currentGames.length,
+              );
+            } else if (snapshot.hasError) {
+              return Center(child: Container(child: Text("Network Error")));
+            } else if (currentGames.length == 0) {
+              return Center(child: Container(child: Text("Empty")));
+            }
+//          }
 
           return Center(child: Container(child: Text("unexpected")));
 //          else {
@@ -371,40 +439,13 @@ class _UserScreen extends State<UserScreen> {
       ),
     );
 
-//    return FutureBuilder(
-//      future:
-////      Future.delayed(Duration(seconds: 2)),
-//          _fetchNetworkData(
-//              "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg"),
-//      // todo
-//      builder: (BuildContext context, AsyncSnapshot snapshot) {
-//        if (snapshot.connectionState == ConnectionState.done) {
-//          log("DONE");
-
-    return NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification scrollInfo) {
-          if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-            loadMore();
-          }
-        },
-        child: Column(
-          children: <Widget>[
-            mainInfoSection,
-            Expanded(
-              child: secondPart,
-            ),
-          ],
-        ));
-  }
-}
-
-class Album {
-  final String name;
-  final String lastname;
-
-  Album({this.name, this.lastname});
-
-  factory Album.fromJson(Map<String, dynamic> json) {
-    return Album(name: json['name'], lastname: json['lastname']);
+    return Column(
+      children: <Widget>[
+        mainInfoSection,
+        Expanded(
+          child: secondPart,
+        ),
+      ],
+    );
   }
 }

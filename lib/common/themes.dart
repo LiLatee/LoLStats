@@ -20,7 +20,7 @@ final baseTheme = ThemeData(
 //  primaryColor: Color(0xff6c7b95),
 //  accentColor: Color(0xff8bbabb),
   primaryColor: Colors.pink[800],
-  accentColor: Colors.cyan[600],
+  accentColor: Colors.cyan[500],
   textTheme: TextTheme(
     headline2: TextStyle(
       fontSize: 22.0,

@@ -7,6 +7,7 @@ double roundDouble(double value, int places){
   return ((value * mod).round().toDouble() / mod);
 }
 
+//TODO link zależny od patcha
 Image getChampionSplash(String championName) {
   return Image.network(
       "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championName}_0.jpg",

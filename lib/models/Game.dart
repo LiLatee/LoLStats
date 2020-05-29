@@ -1,52 +1,46 @@
-
-import 'package:flutter/cupertino.dart';
-import 'package:lolstats/models/Champion.dart';
-import 'package:lolstats/models/KDA.dart';
-
 class Game {
-  Champion _champion;
-  bool _isWin;
-  KDA _kda;
-  int _minutes;
-  int _seconds;
+  final int mainRune;
+  final int secondRune;
 
-  Game(Champion champion, bool isWin, KDA kda, int minutes, int seconds){
-    this._champion = champion;
-    this._isWin = isWin;
-    this._kda = kda;
-    this._minutes = minutes;
-    this._seconds = seconds;
+  //TODO dodać summoner spelle
+  final int championID;
+  final bool isWin;
+  final int gameDurationSecs;
+  final Map<String, int> KDA;
+
+  Game(
+      {this.mainRune,
+        this.secondRune,
+        this.championID,
+        this.isWin,
+        this.gameDurationSecs,
+        this.KDA});
+
+  factory Game.dummy() {
+    return Game(
+      mainRune: -1,
+      secondRune: -1,
+      championID: null,
+      isWin: null,
+      gameDurationSecs: null,
+      KDA: null
+
+    );
   }
 
-  int get seconds => _seconds;
+  factory Game.fromJson(Map<String, dynamic> json) {
+    return Game(
+      mainRune: json["base_data"]['perks'][0],
+      secondRune: json["base_data"]['perks'][1],
+      championID: json['base_data']['championId'],
+      isWin: json['base_data']['win'],
+      gameDurationSecs: json['base_data']['game_duration'],
+      KDA: {
+        'kills': json['base_data']['KDA'][0],
+        'deaths': json['base_data']['KDA'][1],
+        'assists': json['base_data']['KDA'][2]
+      },
 
-  set seconds(int value) {
-    _seconds = value;
+    );
   }
-
-  int get minutes => _minutes;
-
-  set minutes(int value) {
-    _minutes = value;
-  }
-
-  KDA get kda => _kda;
-
-  set kda(KDA kda){
-    _kda = kda;
-  }
-
-  bool get isWin => _isWin;
-
-  set isWin(bool value) {
-    _isWin = value;
-  }
-
-  Champion get champion => _champion;
-
-  set champion(Champion value) {
-    _champion = value;
-  }
-
-
 }

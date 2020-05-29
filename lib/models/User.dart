@@ -5,9 +5,12 @@ class User {
   final int summonerLevel;
   final List<QueueData> queuesData;
 
-
-  User({this.profileIconId, this.accountID, this.name,
-    this.summonerLevel, this.queuesData});
+  User(
+      {this.profileIconId,
+      this.accountID,
+      this.name,
+      this.summonerLevel,
+      this.queuesData});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -15,8 +18,9 @@ class User {
         accountID: json['accountID'],
         name: json['name'],
         summonerLevel: json['summonerLevel'],
-        queuesData: json['ranked_data'].map<QueueData>((queueJson) => QueueData.fromJson(queueJson)).toList()
-    );
+        queuesData: json['ranked_data']
+            .map<QueueData>((queueJson) => QueueData.fromJson(queueJson))
+            .toList());
   }
 }
 
@@ -35,13 +39,22 @@ class QueueData {
   final bool freshBlood;
   final bool hotStreak;
 
-  QueueData({this.leagueId, this.queueType, this.tier, this.rank,
-    this.summonerId, this.summonerName, this.leaguePoints, this.wins,
-    this.losses, this.veteran, this.inactive, this.freshBlood,
-    this.hotStreak});
+  QueueData(
+      {this.leagueId,
+      this.queueType,
+      this.tier,
+      this.rank,
+      this.summonerId,
+      this.summonerName,
+      this.leaguePoints,
+      this.wins,
+      this.losses,
+      this.veteran,
+      this.inactive,
+      this.freshBlood,
+      this.hotStreak});
 
   factory QueueData.fromJson(Map<String, dynamic> json) {
-
     return QueueData(
         leagueId: json["leagueId"],
         queueType: json["queueType"],
@@ -55,9 +68,7 @@ class QueueData {
         veteran: json["veteran"],
         inactive: json["inactive"],
         freshBlood: json["freshBlood"],
-        hotStreak: json["hotStreak"]
-    );
+        hotStreak: json["hotStreak"]);
   }
-
-
 }
+
