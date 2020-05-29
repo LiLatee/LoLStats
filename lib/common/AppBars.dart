@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lolstats/screens/UserScreen.dart';
 import '../common/themes.dart';
 
 AppBar baseAppBar(BuildContext context) {
@@ -21,6 +22,8 @@ AppBar baseAppBar(BuildContext context) {
       ],
     );
   }
+
+
 
   SliverAppBar baseSliverAppBar(BuildContext context) {
     return SliverAppBar(
@@ -87,62 +90,8 @@ class CustomSearchDelegate extends SearchDelegate {
         ],
       );
     }
+    return UserScreen(userName: query);
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text("Ale wyszukanko"),
-        ],
-      ),
-    );
-
-    //Add the search term to the searchBloc.
-    //The Bloc will then handle the searching and add the results to the searchResults stream.
-    //This is the equivalent of submitting the search term to whatever search service you are using
-//    InheritedBlocs.of(context)
-//        .searchBloc
-//        .searchTerm
-//        .add(query);
-
-//    return Column(
-//      children: <Widget>[
-//        //Build the results based on the searchResults stream in the searchBloc
-//        StreamBuilder(
-//          stream: InheritedBlocs.of(context).searchBloc.searchResults,
-//          builder: (context, AsyncSnapshot<List<Result>> snapshot) {
-//            if (!snapshot.hasData) {
-//              return Column(
-//                crossAxisAlignment: CrossAxisAlignment.center,
-//                mainAxisAlignment: MainAxisAlignment.center,
-//                children: <Widget>[
-//                  Center(child: CircularProgressIndicator()),
-//                ],
-//              );
-//            } else if (snapshot.data.length == 0) {
-//              return Column(
-//                children: <Widget>[
-//                  Text(
-//                    "No Results Found.",
-//                  ),
-//                ],
-//              );
-//            } else {
-//              var results = snapshot.data;
-//              return ListView.builder(
-//                itemCount: results.length,
-//                itemBuilder: (context, index) {
-//                  var result = results[index];
-//                  return ListTile(
-//                    title: Text(result.title),
-//                  );
-//                },
-//              );
-//            }
-//          },
-//        ),
-//      ],
-//    );
   }
 
   @override
