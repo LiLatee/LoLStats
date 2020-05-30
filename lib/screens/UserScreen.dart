@@ -44,7 +44,7 @@ class _UserScreen extends State<UserScreen> {
 
   Future<User> fetchUser() async {
     final response = await http
-        .get('http://192.168.1.68:5000/get_player_profile_info/${userName}');
+        .get(util.SERVER_ADDRESS+'get_player_profile_info/${userName}');
 
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
@@ -56,11 +56,10 @@ class _UserScreen extends State<UserScreen> {
     }
   }
 
-  Future<List<Game>> fetchGames({bool progressIndicator=false}) async {
+  Future<List<Game>> fetchGames({bool progressIndicator = false}) async {
     final response = await http.get(
-        'http://192.168.1.68:5000/get_player_history_nick/$userName?n_games=$perPage&index_begin=$present');
+        util.SERVER_ADDRESS + 'get_player_history_nick/$userName?n_games=$perPage&index_begin=$present');
 
-    log(response.statusCode.toString(), name: "MOJE_LOGI");
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
       List<Game> games = jsonResponse
@@ -68,10 +67,9 @@ class _UserScreen extends State<UserScreen> {
           .toList();
 
       if (progressIndicator) {
-        currentGames.remove(currentGames[currentGames.length-1]);
+        currentGames.remove(currentGames[currentGames.length - 1]);
       }
       currentGames.addAll(games);
-      log(currentGames.length.toString(), name: "MOJE_LOGI");
       present = present + perPage;
 
       return games;
@@ -88,8 +86,8 @@ class _UserScreen extends State<UserScreen> {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
       setState(() {
-        log("DOL", name: "MOJE_LOGI");
-        if (!(currentGames[currentGames.length-1].mainRune == -1) && !(currentGames[currentGames.length-1].secondRune == -1)) {
+        if (!(currentGames[currentGames.length - 1].mainRune == -1) &&
+            !(currentGames[currentGames.length - 1].secondRune == -1)) {
           currentGames.add(Game.dummy());
         }
         futureGames = fetchGames(progressIndicator: true);
@@ -118,13 +116,12 @@ class _UserScreen extends State<UserScreen> {
     if (game.mainRune == -1 && game.secondRune == -1) {
       return Container(
           color: baseTheme.primaryColor,
-        alignment: Alignment.center,
+          alignment: Alignment.center,
           child: CircularProgressIndicator());
     }
     Color color = game.isWin ? Colors.green[400] : Colors.red[400];
     String gameResult = (game.isWin) ? "Win" : "Lose";
     Image image = util.getChampionAvatar("Zed"); //TODO: champion id?
-
 
 //    return Container(
 //      height: 100,
@@ -342,57 +339,24 @@ class _UserScreen extends State<UserScreen> {
       ),
     );
 
-//    Widget gamesList2 = Container(
-//      child: FutureBuilder<List<Album>>(
-//        future: futureGames2,
-//        builder: (context, snapshot) {
-//          if (currentGames2.length != 0) {
-//            return ListView.builder(
-//              itemBuilder: (context, index) => _buildTile2(currentGames2[index]),
-//              itemCount: currentGames2.length,
-//            );
-//          } else if (currentGames2.length == 0) {
-//            return Center(child: Container(child: Text("Empty")));
-//          } else if (snapshot.hasError) {
-//            return Center(child: Container(child: Text("Network Error")));
-//          }
-//
-//          return Center(child: Container(child: Text("unexpected")));
-////          else {
-////            if (currentGames.length != 0) {
-////              return ListView.builder(
-////                itemBuilder: (context, index) =>
-////                    _buildTile2(currentGames[index]),
-////                itemCount:
-////                currentGames.length,
-//////                  (present <= _games.length) ? items.length + 1 : items.length,
-////              );
-////            }
-////          };
-//        },
-//      ),
-//    );
-
     Widget gamesList = Container(
       alignment: Alignment.center,
       child: FutureBuilder<List<Game>>(
         future: futureGames,
         builder: (context, snapshot) {
-//          if (snapshot.connectionState != ConnectionState.done) {
-//            return CircularProgressIndicator();
-//          } else {
-            if (currentGames.length != 0) {
-              return ListView.builder(
-                controller: _controller,
-                itemBuilder: (context, index) =>
-                    _buildTile(currentGames[index]),
-                itemCount: currentGames.length,
-              );
-            } else if (snapshot.hasError) {
-              return Center(child: Container(child: Text("Network Error")));
-            } else if (currentGames.length == 0) {
-              return Center(child: Container(child: Text("Empty")));
-            }
+          if (currentGames.length != 0) {
+            return ListView.builder(
+              controller: _controller,
+              itemBuilder: (context, index) => _buildTile(currentGames[index]),
+              itemCount: currentGames.length,
+            );
+          } else if (snapshot.hasError) {
+            return Center(child: Container(child: Text("Network Error")));
+          } else if (snapshot.connectionState != ConnectionState.done) {
+            return CircularProgressIndicator();
+          } else if (currentGames.length == 0) {
+            return Center(child: Container(child: Text("Empty")));
+          }
 //          }
 
           return Center(child: Container(child: Text("unexpected")));
