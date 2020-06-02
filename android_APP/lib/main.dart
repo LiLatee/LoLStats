@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lolstats/common/themes.dart';
 import 'package:lolstats/screens/HomeScreen.dart';
-import 'file:///D:/Dokumenty/Projekty/AndroidStudioProjects/lol_stats/lib/common/AppBars.dart' as AppBars;
-import 'package:lolstats/screens/UserScreen.dart';
+import 'package:lolstats/common/AppBars.dart' as AppBars;
 import 'common/themes.dart';
 void main() => runApp(MyApp());
 

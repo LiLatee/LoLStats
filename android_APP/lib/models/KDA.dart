@@ -3,7 +3,7 @@ class KDA {
   int _deaths;
   int _assists;
 
-  KDA (int kills, int deaths, int assists)
+  KDA ({int kills, int deaths, int assists})
   {
     this._kills = kills;
     this._deaths = deaths;
