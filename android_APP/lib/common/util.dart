@@ -20,7 +20,7 @@ Image getChampionSplash(String championName) {
 
 Image getChampionAvatar(String championName) {
   return Image.network(
-      "http://ddragon.leagueoflegends.com/cdn/10.10.3216176/img/champion/${championName}.png",
+      "http://ddragon.leagueoflegends.com/cdn/10.10.3216176/img/champion/$championName.png",
       fit: BoxFit.fill);
 }
 
@@ -32,6 +32,12 @@ Image getChampionLoadingSplash(String championName) {
 
 Image getProfileIcon(String ID) {
   return Image.network(
-      "http://ddragon.leagueoflegends.com/cdn/10.11.1/img/profileicon/${ID}.png",
+      "http://ddragon.leagueoflegends.com/cdn/10.11.1/img/profileicon/$ID.png",
+      fit: BoxFit.fill);
+}
+
+Image getItemIcon(int ID) {
+  return Image.network(
+      "http://ddragon.leagueoflegends.com/cdn/10.11.1/img/item/$ID.png",
       fit: BoxFit.fill);
 }
