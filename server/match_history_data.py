@@ -4,7 +4,7 @@ import pandas as pd
 from pandas import json_normalize
 
 # https://developer.riotgames.com/
-KEY= "RGAPI-d4609329-5a0d-4336-88c2-20aa9a82a2fb"
+KEY= "RGAPI-00162eb9-f6d3-4994-b66a-51fb5501e41a"
 
 
 
@@ -166,11 +166,17 @@ def get_profile_info_for_player(summonername):
     return json.dumps(profile_info_data)
 
 def get_all_champions_data_patch(patch):
-    if patch == None:
+    if patch is None:
         patch = '10.1.1'
+        print("CO JEST")
+
+    print(type(patch))
     print(patch)
     champs_url = "http://ddragon.leagueoflegends.com/cdn/{0}/data/en_US/champion.json".format(patch)
+    
     r = requests.get(url = champs_url) 
+    print("rrrr: ", champs_url)
+    print("rrrr: ", str(r))
     champions_data = r.json()
     champs=pd.DataFrame.from_dict(champions_data.values())
     champions = to_df(champs[0][3])

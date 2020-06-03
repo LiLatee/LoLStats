@@ -58,12 +58,13 @@ class _UserScreen extends State<UserScreen> {
     }
   }
 
-  Future<List<Game>> fetchGames({List<Game> games, bool progressIndicator = false}) async {
+  Future<List<Game>> fetchGames(
+      {List<Game> games, bool progressIndicator = false}) async {
     if (games != null) {
-        currentGames.addAll(games);
-        present = currentGames.length;
-        return games;
-      }
+      currentGames.addAll(games);
+      present = currentGames.length;
+      return games;
+    }
     final response = await http.get(util.SERVER_ADDRESS +
         'get_player_history_nick/$userName?n_games=$perPage&index_begin=$present');
 
@@ -110,20 +111,20 @@ class _UserScreen extends State<UserScreen> {
     _controller.addListener(_scrollListener);
     futureUser = fetchUser();
     log("beeeeeeee", name: "MOJE_LOGI");
-    if (util.bucket.readState(context, identifier: ValueKey(util.mykey)) != null) {
+    if (util.bucket.readState(context, identifier: ValueKey(util.mykey)) !=
+        null) {
       setState(() {
-        List<Game> g = util.bucket.readState(context, identifier: ValueKey(util.mykey));
+        List<Game> g =
+            util.bucket.readState(context, identifier: ValueKey(util.mykey));
         futureGames = fetchGames(games: g);
         log(g.length.toString(), name: "MOJE_LOGI");
       });
 
       log("Hmmmm", name: "MOJE_LOGI");
-    }
-    else {
+    } else {
       log("EHHHHHHHHH", name: "MOJE_LOGI");
       futureGames = fetchGames();
     }
-
   }
 
   void loadMore() {
@@ -131,6 +132,7 @@ class _UserScreen extends State<UserScreen> {
       futureGames = fetchGames();
     });
   }
+
   Widget _buildTile(Game game) {
     const double CHAMP_AVATAR_SIZE = 27.0;
     const double EDGE_INSECTS_IN_TEAMS_INFO = 8.0;
@@ -213,13 +215,13 @@ class _UserScreen extends State<UserScreen> {
         padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
         child: Column(
           children: <Widget>[
-        Text((game.gameDurationSecs ~/ 60).toString() +
+            Text((game.gameDurationSecs ~/ 60).toString() +
                 ":" +
                 (game.gameDurationSecs % 60).toString().padLeft(2, '0')),
             FittedBox(
               fit: BoxFit.scaleDown,
-              child:
-                  Text("CS: " + 123.toString(), style: TextStyle(fontSize: 12)),
+              child: Text("CS: " + game.totalMinionsKilled.toString(),
+                  style: TextStyle(fontSize: 12)),
             )
           ],
         ),
@@ -243,37 +245,34 @@ class _UserScreen extends State<UserScreen> {
         ),
       );
 
-      Image exampleItem = Image.network(
-        'https://vignette.wikia.nocookie.net/leagueoflegends/images/9/9f/Warmog%27s_Armor_item.png/revision/latest?cb=20171222001951',
-        width: CHAMP_AVATAR_SIZE,
-        height: CHAMP_AVATAR_SIZE,
-      );
       Widget emptyItem = Opacity(
         opacity: 0.7,
-        child: Container(
-          width: CHAMP_AVATAR_SIZE,
-          height: CHAMP_AVATAR_SIZE,
-          color: Colors.grey,
-        ),
+        child: Container(color: Colors.grey),
       );
 
+      List<Widget> items = game.items
+          .map((e) => e == 0
+              ? Container(
+                  padding: EdgeInsets.all(1),
+                  width: CHAMP_AVATAR_SIZE,
+                  height: CHAMP_AVATAR_SIZE,
+                  child: emptyItem)
+              : Container(
+                  padding: EdgeInsets.all(1),
+                  child: util.getItemIcon(e),
+                  width: CHAMP_AVATAR_SIZE,
+                  height: CHAMP_AVATAR_SIZE,
+                ))
+          .toList();
       Widget itemsSection = Container(
         padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
         child: Column(
           children: <Widget>[
             Row(
-              children: <Widget>[
-                exampleItem,
-                exampleItem,
-                exampleItem,
-              ],
+              children: items.sublist(0, 3),
             ),
             Row(
-              children: <Widget>[
-                exampleItem,
-                exampleItem,
-                emptyItem,
-              ],
+              children: items.sublist(3, 6),
             ),
           ],
         ),
@@ -318,23 +317,25 @@ class _UserScreen extends State<UserScreen> {
     void openMatchStats() {
       setState(() {
         List<Game> temp = List<Game>();
-        for (var i=0; i<currentGames.length; i++) {
-          if (currentGames[i] != Game.dummy())
-            {
-              temp.add(currentGames[i]);
-            }
+        for (var i = 0; i < currentGames.length; i++) {
+          if (currentGames[i] != Game.dummy()) {
+            temp.add(currentGames[i]);
+          }
         }
-        util.bucket.writeState(context, temp,
-            identifier: ValueKey(util.mykey));
+        util.bucket.writeState(context, temp, identifier: ValueKey(util.mykey));
       });
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => GameStatsPlayersTableScreen(game: game)));
+          context,
+          MaterialPageRoute(
+              builder: (context) => GameStatsPlayersTableScreen(game: game)));
     }
+
     return GestureDetector(
       onTap: () => openMatchStats(),
       child: createRow(
           NetworkImage(
-              'https://gamepedia.cursecdn.com/lolesports_gamepedia_en/4/4a/AsheSquare.png'), //TODO
+              'https://gamepedia.cursecdn.com/lolesports_gamepedia_en/4/4a/AsheSquare.png'),
+          //TODO
           100, // TODO
           100, // TODO
           game.kda),
@@ -521,7 +522,8 @@ class _UserScreen extends State<UserScreen> {
               itemCount: currentGames.length,
             );
           } else if (snapshot.hasError) {
-            return Center(child: Container(child: Text(snapshot.error.toString())));
+            return Center(
+                child: Container(child: Text(snapshot.error.toString())));
           } else if (snapshot.connectionState != ConnectionState.done) {
             return CircularProgressIndicator();
           } else if (currentGames.length == 0) {
@@ -564,7 +566,8 @@ class _UserScreen extends State<UserScreen> {
           Expanded(
             child: TabBarView(
               children: <Widget>[
-                gamesList,
+            PageStorage(
+            key: util.mykey, bucket: util.bucket, child: gamesList),
                 Center(child: Text("Soon :)")),
               ],
             ),
@@ -573,18 +576,11 @@ class _UserScreen extends State<UserScreen> {
       ),
     );
 
-
-
     return Column(
       children: <Widget>[
-        AspectRatio(
-            aspectRatio: 16/9,
-            child: mainInfoSection),
+        AspectRatio(aspectRatio: 16 / 9, child: mainInfoSection),
         Expanded(
-          child: PageStorage(
-            key: util.mykey,
-              bucket: util.bucket,
-              child: secondPart),
+          child: secondPart,
         ),
       ],
     );
