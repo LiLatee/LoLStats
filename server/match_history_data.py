@@ -22,18 +22,6 @@ def get_summoner_data_by_name(name):
     summoner_data = r.json() 
     return summoner_data
 
-def get_all_champions_data_patch(patch):
-    champs_url = "http://ddragon.leagueoflegends.com/cdn/{0}/data/en_US/champion.json".format(patch)
-    r = requests.get(url = champs_url) 
-    champions_data = r.json()
-    champs=pd.DataFrame.from_dict(champions_data.values())
-    champions = to_df(champs[0][3])
-    champions.reset_index()
-#     champions = pd.concat([champions.drop(['info'], axis=1), json_normalize(champions['info'])], axis=1)
-    champions = pd.concat([champions.drop(['stats'], axis=1), json_normalize(champions['stats'])], axis=1)
-    champions = pd.concat([champions.drop(['image'], axis=1), json_normalize(champions['image'])], axis=1)
-    champions = champions.drop(['name'], axis=1)
-    return champions
 
 def get_history_for_player_id(player_id,champion_id='',queue='',season='',endTime='',beginTime='',endIndex='',beginIndex=''):
     params = "?"
@@ -176,3 +164,52 @@ def get_profile_info_for_player(summonername):
     profile_info_data['summonerLevel'] = summoner_data['summonerLevel']
     profile_info_data['ranked_data'] = all_rankeds_data
     return json.dumps(profile_info_data)
+
+def get_all_champions_data_patch(patch):
+    if patch == None:
+        patch = '10.1.1'
+    print(patch)
+    champs_url = "http://ddragon.leagueoflegends.com/cdn/{0}/data/en_US/champion.json".format(patch)
+    r = requests.get(url = champs_url) 
+    champions_data = r.json()
+    champs=pd.DataFrame.from_dict(champions_data.values())
+    champions = to_df(champs[0][3])
+    champions.reset_index()
+#     champions = pd.concat([champions.drop(['info'], axis=1), json_normalize(champions['info'])], axis=1)
+    champions = pd.concat([champions.drop(['stats'], axis=1), json_normalize(champions['stats'])], axis=1)
+    champions = pd.concat([champions.drop(['image'], axis=1), json_normalize(champions['image'])], axis=1)
+    champions = champions.drop(['name'], axis=1)
+    return champions
+
+def generate_champions_ids(patch):
+    champions = get_all_champions_data_patch(patch)
+    champ_ids = dict()
+    for i,row in champions.iterrows():
+        champ_ids[row['key']] = row['id']
+    return champ_ids
+
+def generate_newest_patch():
+    versions_url = 'https://ddragon.leagueoflegends.com/api/versions.json'
+    r = requests.get(url = versions_url) 
+    versions = r.json()
+    return versions[0]
+
+def generate_summoners_ids():
+    summoners_url = 'http://ddragon.leagueoflegends.com/cdn/10.11.1/data/en_US/summoner.json'
+    r = requests.get(url = summoners_url) 
+    summoners_json = r.json()
+    summoners = dict()
+    for summoner in summoners_json['data']:
+        summoners[summoners_json['data'][summoner]['key']] = summoners_json['data'][summoner]['name']
+
+    return summoners
+
+def generate_perks_ids():
+    runes_url = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perks.json'
+    r = requests.get(url = runes_url) 
+    runes_json = r.json()
+    runes = dict()
+    for rune in runes_json:
+        runes[rune['id']] = rune['name']
+    return runes
+        
