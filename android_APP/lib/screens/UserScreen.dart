@@ -5,13 +5,15 @@ import 'package:lolstats/models/Champion.dart';
 
 import 'package:lolstats/models/KDA.dart';
 import 'package:lolstats/models/User.dart';
-import 'package:lolstats/screens/GameStatsScreen.dart';
+import 'package:lolstats/screens/GameStatsPlayersTableScreen.dart';
 import 'package:lolstats/common/TextStyles.dart' as MyTextStyles;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:developer';
 import 'package:lolstats/common/util.dart' as util;
 import 'package:lolstats/models/Game.dart';
+
+//https://eune.leagueoflegends.com/pl-pl/news/game-updates/patch-10-11-notes/
 
 class UserScreen extends StatefulWidget {
   final String userName;
@@ -44,7 +46,7 @@ class _UserScreen extends State<UserScreen> {
 
   Future<User> fetchUser() async {
     final response = await http
-        .get(util.SERVER_ADDRESS+'get_player_profile_info/${userName}');
+        .get(util.SERVER_ADDRESS + 'get_player_profile_info/${userName}');
 
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
@@ -56,12 +58,18 @@ class _UserScreen extends State<UserScreen> {
     }
   }
 
-  Future<List<Game>> fetchGames({bool progressIndicator = false}) async {
-    final response = await http.get(
-        util.SERVER_ADDRESS + 'get_player_history_nick/$userName?n_games=$perPage&index_begin=$present');
+  Future<List<Game>> fetchGames({List<Game> games, bool progressIndicator = false}) async {
+    if (games != null) {
+        currentGames.addAll(games);
+        present = currentGames.length;
+        return games;
+      }
+    final response = await http.get(util.SERVER_ADDRESS +
+        'get_player_history_nick/$userName?n_games=$perPage&index_begin=$present');
 
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
+
       List<Game> games = jsonResponse
           .map<Game>((jsonGame) => Game.fromJson(jsonGame))
           .toList();
@@ -86,7 +94,7 @@ class _UserScreen extends State<UserScreen> {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
       setState(() {
-        if (!(currentGames[currentGames.length - 1].mainRune == -1) &&
+        if (!(currentGames[currentGames.length - 1].primaryRune == -1) &&
             !(currentGames[currentGames.length - 1].secondRune == -1)) {
           currentGames.add(Game.dummy());
         }
@@ -98,12 +106,24 @@ class _UserScreen extends State<UserScreen> {
   @override
   void initState() {
     super.initState();
-    setState(() {
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
+    futureUser = fetchUser();
+    log("beeeeeeee", name: "MOJE_LOGI");
+    if (util.bucket.readState(context, identifier: ValueKey(util.mykey)) != null) {
+      setState(() {
+        List<Game> g = util.bucket.readState(context, identifier: ValueKey(util.mykey));
+        futureGames = fetchGames(games: g);
+        log(g.length.toString(), name: "MOJE_LOGI");
+      });
+
+      log("Hmmmm", name: "MOJE_LOGI");
+    }
+    else {
+      log("EHHHHHHHHH", name: "MOJE_LOGI");
       futureGames = fetchGames();
-      futureUser = fetchUser();
-      _controller = ScrollController();
-      _controller.addListener(_scrollListener);
-    });
+    }
+
   }
 
   void loadMore() {
@@ -111,91 +131,242 @@ class _UserScreen extends State<UserScreen> {
       futureGames = fetchGames();
     });
   }
-
   Widget _buildTile(Game game) {
-    if (game.mainRune == -1 && game.secondRune == -1) {
+    const double CHAMP_AVATAR_SIZE = 27.0;
+    const double EDGE_INSECTS_IN_TEAMS_INFO = 8.0;
+
+    if (game.primaryRune == -1 && game.secondRune == -1) {
       return Container(
           color: baseTheme.primaryColor,
           alignment: Alignment.center,
           child: CircularProgressIndicator());
     }
     Color color = game.isWin ? Colors.green[400] : Colors.red[400];
-    String gameResult = (game.isWin) ? "Win" : "Lose";
+    String gameResult = (game.isWin) ? "Win" : "Loss";
     Image image = util.getChampionAvatar("Zed"); //TODO: champion id?
 
-//    return Container(
-//      height: 100,
-////      color: color,
-//      child: Card(
-//        color: color,
-//        elevation: 5,
-//        child: Stack(
-//            fit: StackFit.expand,
-//            children: [
-//              Opacity(
-//                opacity: 0.6,
-//                child: Container(
-//                  decoration: BoxDecoration(
-//                    image: DecorationImage(fit: BoxFit.fitWidth,
-//                        alignment: FractionalOffset.topCenter,
-//                        image: NetworkImage(imageURL)),
-//                  ),
+    Widget createRow(
+        NetworkImage champIcon, int mainRune, int secondRune, KDA kda) {
+      Widget avatarSection = CircleAvatar(
+        backgroundImage: image.image,
+        radius: CHAMP_AVATAR_SIZE,
+      );
+
+      Widget spellsRunesSection = Container(
+          padding: EdgeInsets.only(left: 8.0),
+          child: Row(
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Container(
+                    height: CHAMP_AVATAR_SIZE,
+                    width: CHAMP_AVATAR_SIZE,
+                    child: Image.network(
+                        'https://vignette.wikia.nocookie.net/leagueoflegends/images/7/74/Flash.png/revision/latest?cb=20180514003149'),
+                  ),
+                  Container(
+                    height: CHAMP_AVATAR_SIZE,
+                    width: CHAMP_AVATAR_SIZE,
+                    child: Image.network(
+                        'https://vignette.wikia.nocookie.net/leagueoflegends/images/f/f4/Ignite.png/revision/latest?cb=20180514003345'),
+                  ),
+                ],
+              ),
+              Column(
+                children: <Widget>[
+                  CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    radius: CHAMP_AVATAR_SIZE / 2,
+                    child: util.getChampionAvatar("Ezreal"),
+                  ),
+                  CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    radius: CHAMP_AVATAR_SIZE / 2,
+                    child: util.getChampionAvatar("Caitlyn"),
+                  ),
+                ],
+              ),
+            ],
+          ));
+
+//      Widget nickAndCsSection = Container(
+//        padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
+//        child: FittedBox(
+//          fit: BoxFit.scaleDown,
+//          child: Column(
+//            children: <Widget>[
+//              Text(
+//                playerName,
+//                style: TextStyle(
+//                  color: Colors.black,
+//                  fontWeight: FontWeight.w600,
+//                  fontSize: 16.0,
 //                ),
 //              ),
-//              Opacity(
-//                opacity: 0.3,
-//                child: Container(
-//                  color: Colors.white,
-//                ),
-//              ),
-//        ListTile(
-//          title: Text(game.KDA['kills'].toString() +
-//              "/" +
-//              game.KDA['deaths'].toString() +
-//              "/" +
-//              game.KDA['assists'].toString()),
-//          subtitle:
-//          Text(game.minutes.toString() + ":" + game.seconds.toString()),
-//          leading: Container(
-//            width: 50,
-//            child: Text(
-//              gameResult,
-//              overflow: TextOverflow.ellipsis,
-//              softWrap: false,
-//              style: MyTextStyles.gameResult,
-//
-//            ),
+//              Text("CS: " + 123.toString(), style: TextStyle(fontSize: 12)),
+//            ],
 //          ),
 //        ),
-//            ]),
-//      ),
-//    );
+//      );
 
-    return GestureDetector(
-      onTap: () => Navigator.push(
-          context, MaterialPageRoute(builder: (context) => GameStatsScreen())),
-      child: Card(
-        elevation: 5,
-        child: Container(
-          color: color,
-          child: ListTile(
-            leading: image,
-            title: Text((game.KDA['kills'].toString() +
-                '/' +
-                game.KDA['deaths'].toString() +
-                '/' +
-                game.KDA['assists'].toString())),
-            subtitle: Text((game.gameDurationSecs ~/ 60).toString() +
+      Widget durationAndCsSection = Container(
+        padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
+        child: Column(
+          children: <Widget>[
+        Text((game.gameDurationSecs ~/ 60).toString() +
                 ":" +
                 (game.gameDurationSecs % 60).toString().padLeft(2, '0')),
-            trailing: Text(
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child:
+                  Text("CS: " + 123.toString(), style: TextStyle(fontSize: 12)),
+            )
+          ],
+        ),
+      );
+
+      String kdaRatio = kda.deaths > 0
+          ? util
+              .roundDouble(((kda.kills + kda.assists) / kda.deaths), 2)
+              .toString()
+          : util.roundDouble(((kda.kills + kda.assists) / 1), 2).toString();
+      Widget kdaSection = Container(
+        padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Column(
+            children: <Widget>[
+              Text(kda.toString()),
+              Text(kdaRatio.toString(), style: TextStyle(fontSize: 12)),
+            ],
+          ),
+        ),
+      );
+
+      Image exampleItem = Image.network(
+        'https://vignette.wikia.nocookie.net/leagueoflegends/images/9/9f/Warmog%27s_Armor_item.png/revision/latest?cb=20171222001951',
+        width: CHAMP_AVATAR_SIZE,
+        height: CHAMP_AVATAR_SIZE,
+      );
+      Widget emptyItem = Opacity(
+        opacity: 0.7,
+        child: Container(
+          width: CHAMP_AVATAR_SIZE,
+          height: CHAMP_AVATAR_SIZE,
+          color: Colors.grey,
+        ),
+      );
+
+      Widget itemsSection = Container(
+        padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                exampleItem,
+                exampleItem,
+                exampleItem,
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                exampleItem,
+                exampleItem,
+                emptyItem,
+              ],
+            ),
+          ],
+        ),
+      );
+
+      Widget resultSection = Align(
+        alignment: Alignment.centerRight,
+        child: Container(
+          padding: EdgeInsets.only(right: EDGE_INSECTS_IN_TEAMS_INFO),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
               gameResult,
-              style: MyTextStyles.gameResult,
+//              style: MyTextStyles.gameResult,
             ),
           ),
         ),
-      ),
+      );
+
+      return Container(
+        child: Card(
+          margin: EdgeInsets.all(3.0),
+          color: color,
+          child: Container(
+            padding: EdgeInsets.all(2.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                avatarSection,
+                spellsRunesSection,
+                Expanded(flex: 15, child: kdaSection),
+                Expanded(flex: 10, child: durationAndCsSection),
+                Expanded(flex: 20, child: itemsSection),
+                Expanded(flex: 10, child: resultSection),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    void openMatchStats() {
+      setState(() {
+        List<Game> temp = List<Game>();
+        for (var i=0; i<currentGames.length; i++) {
+          if (currentGames[i] != Game.dummy())
+            {
+              temp.add(currentGames[i]);
+            }
+        }
+        util.bucket.writeState(context, temp,
+            identifier: ValueKey(util.mykey));
+      });
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => GameStatsPlayersTableScreen(game: game)));
+    }
+    return GestureDetector(
+      onTap: () => openMatchStats(),
+      child: createRow(
+          NetworkImage(
+              'https://gamepedia.cursecdn.com/lolesports_gamepedia_en/4/4a/AsheSquare.png'), //TODO
+          100, // TODO
+          100, // TODO
+          game.kda),
     );
+
+//    return GestureDetector(
+//      onTap: () => Navigator.push(
+//          context, MaterialPageRoute(builder: (context) => GameStatsScreen())),
+//      child: Card(
+//        elevation: 5,
+//        child: Container(
+//          color: color,
+//          child: ListTile(
+//            leading: image,
+//            title: Container(
+//              child: Text((game.KDA['kills'].toString() +
+//                  '/' +
+//                  game.KDA['deaths'].toString() +
+//                  '/' +
+//                  game.KDA['assists'].toString())),
+//            ),
+//            subtitle: Text((game.gameDurationSecs ~/ 60).toString() +
+//                ":" +
+//                (game.gameDurationSecs % 60).toString().padLeft(2, '0')),
+//            trailing: Text(
+//              gameResult,
+//              style: MyTextStyles.gameResult,
+//            ),
+//          ),
+//        ),
+//      ),
+//    );
   }
 
   @override
@@ -303,9 +474,8 @@ class _UserScreen extends State<UserScreen> {
         );
 
     Widget mainInfoSection = Container(
-      height: 220,
-      alignment: Alignment.center,
       color: baseTheme.primaryColor,
+      alignment: Alignment.center,
       child: FutureBuilder<User>(
         future: futureUser,
         builder: (context, snapshot) {
@@ -351,7 +521,7 @@ class _UserScreen extends State<UserScreen> {
               itemCount: currentGames.length,
             );
           } else if (snapshot.hasError) {
-            return Center(child: Container(child: Text("Network Error")));
+            return Center(child: Container(child: Text(snapshot.error.toString())));
           } else if (snapshot.connectionState != ConnectionState.done) {
             return CircularProgressIndicator();
           } else if (currentGames.length == 0) {
@@ -395,7 +565,7 @@ class _UserScreen extends State<UserScreen> {
             child: TabBarView(
               children: <Widget>[
                 gamesList,
-                GameStatsScreen(),
+                Center(child: Text("Soon :)")),
               ],
             ),
           )
@@ -403,11 +573,18 @@ class _UserScreen extends State<UserScreen> {
       ),
     );
 
+
+
     return Column(
       children: <Widget>[
-        mainInfoSection,
+        AspectRatio(
+            aspectRatio: 16/9,
+            child: mainInfoSection),
         Expanded(
-          child: secondPart,
+          child: PageStorage(
+            key: util.mykey,
+              bucket: util.bucket,
+              child: secondPart),
         ),
       ],
     );

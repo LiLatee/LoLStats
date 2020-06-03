@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 
 const String SERVER_ADDRESS = "http://192.168.1.68:5000/";
-
+PageStorageKey mykey = new PageStorageKey("testkey");
+final PageStorageBucket bucket = new PageStorageBucket();
 
 double roundDouble(double value, int places){
   double mod = pow(10.0, places);

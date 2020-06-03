@@ -7,7 +7,9 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return 'hello'
+    return '''[
+        {"name": "Marcin", "lastname": "Wiecny"}
+    ]'''
 
 
 @app.route('/get_player_history_nick/<nick>')

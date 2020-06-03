@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lolstats/common/AppBars.dart' as AppBars;
 import 'package:http/http.dart' as http;
-
+import 'package:webview_flutter/webview_flutter.dart';
 
 class HomeScreen extends StatefulWidget{
 
@@ -23,7 +23,10 @@ class _HomeScreen extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBars.baseAppBar(context),
       body:
-        Center(child: Text("Hello Summoner")),
+        Center(child:
+        WebView(
+          initialUrl: "https://eune.leagueoflegends.com/pl-pl/news/game-updates/patch-10-11-notes/" ,
+        )),
     );
   }
 }
