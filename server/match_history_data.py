@@ -4,7 +4,7 @@ import pandas as pd
 from pandas import json_normalize
 
 # https://developer.riotgames.com/
-KEY= "RGAPI-c22a4c31-a12b-41b9-ac88-bf37ab044449"
+KEY= "RGAPI-d4609329-5a0d-4336-88c2-20aa9a82a2fb"
 
 
 
@@ -82,7 +82,7 @@ def get_game_data(match_data,account_id):
     
     base_data = dict()
     
-    advance_data = dict()
+    advanced_data = dict()
     
     players_data = dict()
     
@@ -95,29 +95,25 @@ def get_game_data(match_data,account_id):
         players_data[player['participantId']]['summonerName:']= player['player']["summonerName"]
         players_data[player['participantId']]['accountID:']= player['player']["currentAccountId"]
         players_data[player['participantId']]['profileIcon:']= player['player']["profileIcon"]
-    
+
     for player in match_data['participants']:
         players_data[player['participantId']]['stats'] = player['stats']
         kills = player['stats']['kills']
         assists = player['stats']['assists']
         deaths = player['stats']['deaths']
-        players_data[player['participantId']]['KDA'] = [kills,assists,deaths]
-#         items = []
-#         for item in ['item0','item1','item2','item3','item4','item5','item6']:
-#             items.append(player['stats'][item])
-#         runes = []
-#         for rune in ['item0','item1','item2','item3','item4','item5','item6']:
-#             runes.append(player['stats'][item])
-#         players_data[player['participantId']]['items'] = items
-#         players_data[player['participantId']]['largestMultiKill'] = player['stats']['largestMultiKill']
-    
+        players_data[player['participantId']]['KDA'] = [kills,deaths,assists]
+        players_data[player['participantId']]['championId:']= player["championId"]
+        players_data[player['participantId']]['s_spells']= [player["spell1Id"],player["spell2Id"]]
+
+
     base_data = get_base_data_data_for_player(match_data,main_player_id_from_game)
     base_data['KDA'] = players_data[main_player_id_from_game]['KDA']
-    
-    advance_data["players_data"] = players_data
+    base_data['s_spells'] = players_data[main_player_id_from_game]['s_spells']
+
+    advanced_data["players_data"] = players_data
     
     game_data["base_data"] = base_data
-    game_data["advance_data"] = advance_data
+    game_data["advanced_data"] = advanced_data
     return game_data
     
     
@@ -134,6 +130,13 @@ def get_base_data_data_for_player(match_data,main_player_id_from_game):
     base_data = dict()
 #     print(main_player_id_from_game)
 #     print(match_data['participants'][main_player_id_from_game-1])
+    items = []
+    for item in ['item0','item1','item2','item3','item4','item5','item6']:
+            items.append(match_data['participants'][main_player_id_from_game-1]['stats'][item])
+            
+    base_data['items'] = items
+    base_data['totalMinionsKilled'] = match_data['participants'][main_player_id_from_game-1]['stats']['totalMinionsKilled']     
+    
     base_data['perks'] = [match_data['participants'][main_player_id_from_game-1]['stats']['perk0'],
                           match_data['participants'][main_player_id_from_game-1]['stats']['perkSubStyle']]    
     base_data['championId'] = match_data['participants'][main_player_id_from_game-1]['championId']    
