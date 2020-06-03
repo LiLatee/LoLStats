@@ -11,3 +11,10 @@ Widget getNewSectionText(BuildContext context, String sectionName) {
       style: Theme.of(context).textTheme.headline2),
   );
 }
+
+Widget getEmtpyItem(BuildContext context) {
+  return Opacity(
+    opacity: 0.7,
+    child: Container(color: Colors.grey),
+  );
+}

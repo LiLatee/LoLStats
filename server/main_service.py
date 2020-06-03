@@ -28,7 +28,7 @@ def get_player_profile_info(nick):
     profile_data=get_profile_info_for_player(nick)
     return profile_data
 
-@app.route('/get_summoners_ids/')
+@app.route('/get_summoners_spells_ids/')
 def get_summoners_ids():
     summoners=generate_summoners_ids()
     return summoners
@@ -41,7 +41,7 @@ def get_perks_ids():
 @app.route('/get_champions_ids/')
 def get_champions_ids():
     #get_champions_ids/?patch=10.1.1
-    patch  = str(request.args.get('patch', None))
+    patch  = request.args.get('patch', None)
     champions=generate_champions_ids(patch)
     return champions
 

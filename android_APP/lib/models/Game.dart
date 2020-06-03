@@ -1,5 +1,6 @@
 import 'package:lolstats/models/KDA.dart';
 import 'dart:developer';
+
 class Game {
   final int primaryRune;
   final int secondRune;
@@ -9,16 +10,21 @@ class Game {
   final bool isWin;
   final int gameDurationSecs;
   final KDA kda;
+  final List<dynamic> items;
+  final int totalMinionsKilled;
+  final List<dynamic> summonerSpells;
   final List<PlayerData> playersData;
 
-  Game(
-      {this.primaryRune,
-      this.secondRune,
-      this.championID,
-      this.isWin,
-      this.gameDurationSecs,
-      this.kda,
-      this.playersData});
+  Game({this.primaryRune,
+    this.secondRune,
+    this.championID,
+    this.isWin,
+    this.gameDurationSecs,
+    this.kda,
+    this.items,
+    this.summonerSpells,
+    this.totalMinionsKilled,
+    this.playersData});
 
   factory Game.dummy() {
     return Game(
@@ -28,6 +34,9 @@ class Game {
         isWin: null,
         gameDurationSecs: null,
         kda: null,
+        items: null,
+        summonerSpells: null,
+        totalMinionsKilled: null,
         playersData: null);
   }
 
@@ -43,7 +52,11 @@ class Game {
           deaths: json['base_data']['KDA'][1],
           assists: json['base_data']['KDA'][2],
         ),
-        playersData: json['advance_data']['players_data'].entries.map<PlayerData>((e) => PlayerData.fromJson(e.value)).toList());
+        items: json['base_data']['items'],
+        summonerSpells: json['base_data']['s_spells'],
+        totalMinionsKilled: json['base_data']['totalMinionsKilled'],
+        playersData: json['advanced_data']['players_data'].entries.map<
+            PlayerData>((e) => PlayerData.fromJson(e.value)).toList());
   }
 }
 
@@ -54,12 +67,11 @@ class PlayerData {
   Stats stats;
   KDA kda;
 
-  PlayerData(
-      {this.summonerName,
-      this.accountID,
-      this.profileIcon,
-      this.stats,
-      this.kda});
+  PlayerData({this.summonerName,
+    this.accountID,
+    this.profileIcon,
+    this.stats,
+    this.kda});
 
   PlayerData.fromJson(Map<String, dynamic> json) {
     summonerName = json['summonerName:'];
@@ -190,112 +202,113 @@ class Stats {
   int statPerk0;
   int statPerk1;
   int statPerk2;
+  List<dynamic> summonerSpells;
 
-  Stats(
-      {this.participantId,
-      this.win,
-      this.item0,
-      this.item1,
-      this.item2,
-      this.item3,
-      this.item4,
-      this.item5,
-      this.item6,
-      this.kills,
-      this.deaths,
-      this.assists,
-      this.largestKillingSpree,
-      this.largestMultiKill,
-      this.killingSprees,
-      this.longestTimeSpentLiving,
-      this.doubleKills,
-      this.tripleKills,
-      this.quadraKills,
-      this.pentaKills,
-      this.unrealKills,
-      this.totalDamageDealt,
-      this.magicDamageDealt,
-      this.physicalDamageDealt,
-      this.trueDamageDealt,
-      this.largestCriticalStrike,
-      this.totalDamageDealtToChampions,
-      this.magicDamageDealtToChampions,
-      this.physicalDamageDealtToChampions,
-      this.trueDamageDealtToChampions,
-      this.totalHeal,
-      this.totalUnitsHealed,
-      this.damageSelfMitigated,
-      this.damageDealtToObjectives,
-      this.damageDealtToTurrets,
-      this.visionScore,
-      this.timeCCingOthers,
-      this.totalDamageTaken,
-      this.magicalDamageTaken,
-      this.physicalDamageTaken,
-      this.trueDamageTaken,
-      this.goldEarned,
-      this.goldSpent,
-      this.turretKills,
-      this.inhibitorKills,
-      this.totalMinionsKilled,
-      this.neutralMinionsKilled,
-      this.neutralMinionsKilledTeamJungle,
-      this.neutralMinionsKilledEnemyJungle,
-      this.totalTimeCrowdControlDealt,
-      this.champLevel,
-      this.visionWardsBoughtInGame,
-      this.sightWardsBoughtInGame,
-      this.wardsPlaced,
-      this.wardsKilled,
-      this.firstBloodKill,
-      this.firstBloodAssist,
-      this.firstTowerKill,
-      this.firstTowerAssist,
-      this.firstInhibitorKill,
-      this.firstInhibitorAssist,
-      this.combatPlayerScore,
-      this.objectivePlayerScore,
-      this.totalPlayerScore,
-      this.totalScoreRank,
-      this.playerScore0,
-      this.playerScore1,
-      this.playerScore2,
-      this.playerScore3,
-      this.playerScore4,
-      this.playerScore5,
-      this.playerScore6,
-      this.playerScore7,
-      this.playerScore8,
-      this.playerScore9,
-      this.perk0,
-      this.perk0Var1,
-      this.perk0Var2,
-      this.perk0Var3,
-      this.perk1,
-      this.perk1Var1,
-      this.perk1Var2,
-      this.perk1Var3,
-      this.perk2,
-      this.perk2Var1,
-      this.perk2Var2,
-      this.perk2Var3,
-      this.perk3,
-      this.perk3Var1,
-      this.perk3Var2,
-      this.perk3Var3,
-      this.perk4,
-      this.perk4Var1,
-      this.perk4Var2,
-      this.perk4Var3,
-      this.perk5,
-      this.perk5Var1,
-      this.perk5Var2,
-      this.perk5Var3,
-      this.perkPrimaryStyle,
-      this.perkSubStyle,
-      this.statPerk0,
-      this.statPerk1,
-      this.statPerk2});
+  Stats({this.participantId,
+    this.win,
+    this.item0,
+    this.item1,
+    this.item2,
+    this.item3,
+    this.item4,
+    this.item5,
+    this.item6,
+    this.kills,
+    this.deaths,
+    this.assists,
+    this.largestKillingSpree,
+    this.largestMultiKill,
+    this.killingSprees,
+    this.longestTimeSpentLiving,
+    this.doubleKills,
+    this.tripleKills,
+    this.quadraKills,
+    this.pentaKills,
+    this.unrealKills,
+    this.totalDamageDealt,
+    this.magicDamageDealt,
+    this.physicalDamageDealt,
+    this.trueDamageDealt,
+    this.largestCriticalStrike,
+    this.totalDamageDealtToChampions,
+    this.magicDamageDealtToChampions,
+    this.physicalDamageDealtToChampions,
+    this.trueDamageDealtToChampions,
+    this.totalHeal,
+    this.totalUnitsHealed,
+    this.damageSelfMitigated,
+    this.damageDealtToObjectives,
+    this.damageDealtToTurrets,
+    this.visionScore,
+    this.timeCCingOthers,
+    this.totalDamageTaken,
+    this.magicalDamageTaken,
+    this.physicalDamageTaken,
+    this.trueDamageTaken,
+    this.goldEarned,
+    this.goldSpent,
+    this.turretKills,
+    this.inhibitorKills,
+    this.totalMinionsKilled,
+    this.neutralMinionsKilled,
+    this.neutralMinionsKilledTeamJungle,
+    this.neutralMinionsKilledEnemyJungle,
+    this.totalTimeCrowdControlDealt,
+    this.champLevel,
+    this.visionWardsBoughtInGame,
+    this.sightWardsBoughtInGame,
+    this.wardsPlaced,
+    this.wardsKilled,
+    this.firstBloodKill,
+    this.firstBloodAssist,
+    this.firstTowerKill,
+    this.firstTowerAssist,
+    this.firstInhibitorKill,
+    this.firstInhibitorAssist,
+    this.combatPlayerScore,
+    this.objectivePlayerScore,
+    this.totalPlayerScore,
+    this.totalScoreRank,
+    this.playerScore0,
+    this.playerScore1,
+    this.playerScore2,
+    this.playerScore3,
+    this.playerScore4,
+    this.playerScore5,
+    this.playerScore6,
+    this.playerScore7,
+    this.playerScore8,
+    this.playerScore9,
+    this.perk0,
+    this.perk0Var1,
+    this.perk0Var2,
+    this.perk0Var3,
+    this.perk1,
+    this.perk1Var1,
+    this.perk1Var2,
+    this.perk1Var3,
+    this.perk2,
+    this.perk2Var1,
+    this.perk2Var2,
+    this.perk2Var3,
+    this.perk3,
+    this.perk3Var1,
+    this.perk3Var2,
+    this.perk3Var3,
+    this.perk4,
+    this.perk4Var1,
+    this.perk4Var2,
+    this.perk4Var3,
+    this.perk5,
+    this.perk5Var1,
+    this.perk5Var2,
+    this.perk5Var3,
+    this.perkPrimaryStyle,
+    this.perkSubStyle,
+    this.statPerk0,
+    this.statPerk1,
+    this.statPerk2,
+    this.summonerSpells});
 
   Stats.fromJson(Map<String, dynamic> json) {
     participantId = json['participantId'];
@@ -402,6 +415,7 @@ class Stats {
     statPerk0 = json['statPerk0'];
     statPerk1 = json['statPerk1'];
     statPerk2 = json['statPerk2'];
+    summonerSpells = json['s_spells'];
   }
 
   Map<String, dynamic> toJson() {

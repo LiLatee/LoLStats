@@ -10,6 +10,8 @@ import 'package:lolstats/models/PlayerGameStats.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:lolstats/screens/GameStatsTableScreen.dart';
 import 'package:lolstats/common/util.dart' as util;
+import 'package:lolstats/common/CustomWidgets.dart' as CustomWidgets;
+import 'package:lolstats/common/ConstData.dart' as ConstData;
 
 class GameStatsPlayersTableScreen extends StatefulWidget {
   final Game game;
@@ -60,7 +62,7 @@ class _GameStatsPlayersTableScreenState
 
     Widget createRow({PlayerData player}) {
       Widget avatarSection = CircleAvatar(
-        backgroundImage: asheIcon, // TODO
+        backgroundImage: util.getChampionAvatar(ConstData.championsIdsNames["33"]).image, // TODO
         radius: CHAMP_AVATAR_SIZE,
       );
 
@@ -149,7 +151,8 @@ class _GameStatsPlayersTableScreenState
         player.stats.item2,
         player.stats.item3,
         player.stats.item4,
-        player.stats.item5
+        player.stats.item5,
+        player.stats.item6,
       ];
 
       Widget itemsSection = Container(
@@ -157,9 +160,10 @@ class _GameStatsPlayersTableScreenState
         child: Row(
           children: itemsID
               .map((itemID) => Container(
-                    child: util.getItemIcon(itemID),
-                    width: CHAMP_AVATAR_SIZE,
-                    height: CHAMP_AVATAR_SIZE,
+            padding: EdgeInsets.all(1),
+                    child: (itemID != 0) ? util.getItemIcon(itemID) : CustomWidgets.getEmtpyItem(context),
+                    width: CHAMP_AVATAR_SIZE * 1.25,
+                    height: CHAMP_AVATAR_SIZE * 1.25,
                   ))
               .toList(),
         ),
