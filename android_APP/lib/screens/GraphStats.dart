@@ -45,10 +45,11 @@ class GraphStats extends StatelessWidget {
       );
     }
 
-    Widget getBar({int value}) {
-      return Container(
+    Widget getBar({int value, Color color}) {
+      return AnimatedContainer(
+        duration: Duration(seconds: 1),
         margin: EdgeInsets.only(left: 5),
-        color: Colors.blue,
+        color: color,
         height: 5,
         width: DeviceSizes.getPercentOfWidth(
             context: context, percent: 0.8 * value / maxValue),
@@ -67,10 +68,9 @@ class GraphStats extends StatelessWidget {
           children: <Widget>[
             getIcon(champName: ConstData.championsIdsNames[champID.toString()], color: color),
             Column(
-//            crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 getValueText(value: value),
-                getBar(value: value),
+                getBar(value: value, color: color),
               ],
             ),
           ],
