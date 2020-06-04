@@ -24,13 +24,13 @@ class UserScreen extends StatefulWidget {
   UserScreen({Key key, @required this.userName}) : super(key: key);
 
   @override
-  _UserScreen createState() => _UserScreen(userName: userName);
+  _UserScreen createState() => _UserScreen(currentSummonerName: userName);
 }
 
 class _UserScreen extends State<UserScreen> {
-  _UserScreen({@required this.userName});
+  _UserScreen({@required this.currentSummonerName});
 
-  final String userName;
+  final String currentSummonerName;
 
   int normalWins = 300;
   int normalLosses = 350;
@@ -46,7 +46,7 @@ class _UserScreen extends State<UserScreen> {
   Future<User> futureUser;
   Future<User> fetchUser() async {
     final response = await http
-        .get(ConstData.SERVER_ADDRESS + 'get_player_profile_info/${userName}');
+        .get(ConstData.SERVER_ADDRESS + 'get_player_profile_info/${currentSummonerName}');
 
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
@@ -69,7 +69,7 @@ class _UserScreen extends State<UserScreen> {
       return games;
     }
     final response = await http.get(ConstData.SERVER_ADDRESS +
-        'get_player_history_nick/$userName?n_games=$perPage&index_begin=$present');
+        'get_player_history_nick/$currentSummonerName?n_games=$perPage&index_begin=$present');
 
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
@@ -119,11 +119,11 @@ class _UserScreen extends State<UserScreen> {
     _controller.addListener(_scrollListener);
     futureUser = fetchUser();
 
-    if (ConstData.bucket.readState(context, identifier: ValueKey(PageStorageKey(userName))) !=
+    if (ConstData.bucket.readState(context, identifier: ValueKey(PageStorageKey(currentSummonerName))) !=
         null) {
       setState(() {
         List<Game> lastLoadedGames =
-            ConstData.bucket.readState(context, identifier: ValueKey(PageStorageKey(userName)));
+            ConstData.bucket.readState(context, identifier: ValueKey(PageStorageKey(currentSummonerName)));
         futureGames = fetchGames(games: lastLoadedGames);
       });
     } else {
@@ -297,7 +297,6 @@ class _UserScreen extends State<UserScreen> {
         ),
       );
     }
-
     void openMatchStats() {
       setState(() {
         List<Game> temp = List<Game>();
@@ -306,12 +305,12 @@ class _UserScreen extends State<UserScreen> {
             temp.add(currentGames[i]);
           }
         }
-        ConstData.bucket.writeState(context, temp, identifier: ValueKey(PageStorageKey(userName)));
+        ConstData.bucket.writeState(context, temp, identifier: ValueKey(PageStorageKey(currentSummonerName)));
       });
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => GameStatsPlayersTableScreen(game: game)));
+              builder: (context) => GameStatsPlayersTableScreen(game: game, currentSummonerName: currentSummonerName,)));
     }
 
     return GestureDetector(
@@ -486,7 +485,7 @@ class _UserScreen extends State<UserScreen> {
             child: TabBarView(
               children: <Widget>[
                 PageStorage(
-                    key: PageStorageKey(userName),
+                    key: PageStorageKey(currentSummonerName),
                     bucket: ConstData.bucket,
                     child: FutureBuilder(
                       future: futureGames,
