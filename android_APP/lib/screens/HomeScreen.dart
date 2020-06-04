@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:lolstats/common/AppBars.dart' as AppBars;
 import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:lolstats/common/ConstData.dart' as ConstData;
 
 class HomeScreen extends StatefulWidget{
 
@@ -16,9 +17,47 @@ class HomeScreen extends StatefulWidget{
 class _HomeScreen extends State<HomeScreen> {
   ThemeData myTheme;
 
+
+  Future<void> _downloadConstData() async {
+    var response = await http.get(ConstData.SERVER_ADDRESS + 'get_champions_ids/');
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      ConstData.championsIdsNames = jsonResponse;
+    } else {
+      throw Exception('Failed to load ChampionsIdsNames');
+    }
+
+    response = await http.get(ConstData.SERVER_ADDRESS + 'get_perks_ids/');
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      ConstData.perksIdsNames = jsonResponse;
+    } else {
+      throw Exception('Failed to load PerksIdsNames');
+    }
+
+    response =
+    await http.get(ConstData.SERVER_ADDRESS + 'get_summoners_spells_ids/');
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      ConstData.summonersSpellsIdsNames = jsonResponse;
+    } else {
+      throw Exception('Failed to load SummonersSpellsIdsNames');
+    }
+
+    response = await http.get(ConstData.SERVER_ADDRESS + 'get_newest_patch/');
+    if (response.statusCode == 200) {
+      ConstData.newestPatch = response.body;
+    } else {
+      throw Exception('Failed to load NewestPatch');
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     myTheme = Theme.of(context);
+
+    _downloadConstData();
 
     return Scaffold(
       appBar: AppBars.baseAppBar(context),

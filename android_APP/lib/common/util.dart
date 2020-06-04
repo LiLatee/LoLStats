@@ -1,18 +1,15 @@
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:lolstats/common/ConstData.dart' as ConstData;
 
 
-const String SERVER_ADDRESS = "http://192.168.1.68:5000/";
-PageStorageKey mykey = new PageStorageKey("testkey");
-final PageStorageBucket bucket = new PageStorageBucket();
 
 double roundDouble(double value, int places){
   double mod = pow(10.0, places);
   return ((value * mod).round().toDouble() / mod);
 }
 
-//TODO link zależny od patcha
 Image getChampionSplash(String championName) {
   return Image.network(
       "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championName}_0.jpg",
@@ -21,10 +18,11 @@ Image getChampionSplash(String championName) {
 
 Image getChampionAvatar(String championName) {
   return Image.network(
-      "http://ddragon.leagueoflegends.com/cdn/10.10.3216176/img/champion/$championName.png",
+      "http://ddragon.leagueoflegends.com/cdn/${ConstData.newestPatch}/img/champion/$championName.png",
       fit: BoxFit.fill);
 }
 
+// todo a tu nie ma zależności od patcha?
 Image getChampionLoadingSplash(String championName) {
   return Image.network(
       "http://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championName}_0.jpg",
@@ -33,7 +31,7 @@ Image getChampionLoadingSplash(String championName) {
 
 Image getProfileIcon(String ID) {
   return Image.network(
-      "http://ddragon.leagueoflegends.com/cdn/10.11.1/img/profileicon/$ID.png",
+      "http://ddragon.leagueoflegends.com/cdn/${ConstData.newestPatch}/img/profileicon/$ID.png",
       fit: BoxFit.fill);
 }
 

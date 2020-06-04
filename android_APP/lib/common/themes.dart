@@ -16,10 +16,12 @@ import 'package:flutter/material.dart';
 //  );
 
 final baseTheme = ThemeData(
+//  scaffoldBackgroundColor: Colors.pink[800],
+  scaffoldBackgroundColor: Color(0xff303960),
   brightness: Brightness.light,
 //  primaryColor: Color(0xff6c7b95),
-//  accentColor: Color(0xff8bbabb),
-  primaryColor: Colors.pink[800],
+//  accentColor: Color(0xff8bbabb),404b80
+  primaryColor: Color(0xff404b80),
   accentColor: Colors.cyan[500],
   textTheme: TextTheme(
     headline2: TextStyle(

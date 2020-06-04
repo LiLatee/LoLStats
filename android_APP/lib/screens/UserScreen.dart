@@ -5,13 +5,16 @@ import 'package:lolstats/models/Champion.dart';
 
 import 'package:lolstats/models/KDA.dart';
 import 'package:lolstats/models/User.dart';
-import 'package:lolstats/screens/GameStatsPlayersTableScreen.dart';
+import 'package:lolstats/screens/GameStatsScreen.dart';
 import 'package:lolstats/common/TextStyles.dart' as MyTextStyles;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:developer';
 import 'package:lolstats/common/util.dart' as util;
 import 'package:lolstats/models/Game.dart';
+import 'package:lolstats/common/CustomWidgets.dart' as CustomWidgets;
+import 'package:lolstats/common/ConstData.dart' as ConstData;
+
 
 //https://eune.leagueoflegends.com/pl-pl/news/game-updates/patch-10-11-notes/
 
@@ -29,8 +32,6 @@ class _UserScreen extends State<UserScreen> {
 
   final String userName;
 
-  ThemeData myTheme;
-
   int normalWins = 300;
   int normalLosses = 350;
 
@@ -39,14 +40,13 @@ class _UserScreen extends State<UserScreen> {
 
   int perPage = 10;
   int present = 0;
-
-  Future<List<Game>> futureGames;
-  Future<User> futureUser;
   List<Game> currentGames = List<Game>();
 
+
+  Future<User> futureUser;
   Future<User> fetchUser() async {
     final response = await http
-        .get(util.SERVER_ADDRESS + 'get_player_profile_info/${userName}');
+        .get(ConstData.SERVER_ADDRESS + 'get_player_profile_info/${userName}');
 
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
@@ -58,14 +58,17 @@ class _UserScreen extends State<UserScreen> {
     }
   }
 
+  Future<List<Game>> futureGames;
   Future<List<Game>> fetchGames(
       {List<Game> games, bool progressIndicator = false}) async {
     if (games != null) {
-      currentGames.addAll(games);
-      present = currentGames.length;
+      setState(() {
+        currentGames.addAll(games);
+        present = currentGames.length;
+      });
       return games;
     }
-    final response = await http.get(util.SERVER_ADDRESS +
+    final response = await http.get(ConstData.SERVER_ADDRESS +
         'get_player_history_nick/$userName?n_games=$perPage&index_begin=$present');
 
     if (response.statusCode == 200) {
@@ -78,14 +81,18 @@ class _UserScreen extends State<UserScreen> {
       if (progressIndicator) {
         currentGames.remove(currentGames[currentGames.length - 1]);
       }
-      currentGames.addAll(games);
-      present = present + perPage;
+
+      setState(() {
+        currentGames.addAll(games);
+        present = present + perPage;
+      });
+
 
       return games;
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
-      throw Exception('Failed to load album');
+      throw Exception('Failed to load Match History');
     }
   }
 
@@ -100,6 +107,7 @@ class _UserScreen extends State<UserScreen> {
           currentGames.add(Game.dummy());
         }
         futureGames = fetchGames(progressIndicator: true);
+
       });
     }
   }
@@ -110,19 +118,15 @@ class _UserScreen extends State<UserScreen> {
     _controller = ScrollController();
     _controller.addListener(_scrollListener);
     futureUser = fetchUser();
-    log("beeeeeeee", name: "MOJE_LOGI");
-    if (util.bucket.readState(context, identifier: ValueKey(util.mykey)) !=
+
+    if (ConstData.bucket.readState(context, identifier: ValueKey(PageStorageKey(userName))) !=
         null) {
       setState(() {
-        List<Game> g =
-            util.bucket.readState(context, identifier: ValueKey(util.mykey));
-        futureGames = fetchGames(games: g);
-        log(g.length.toString(), name: "MOJE_LOGI");
+        List<Game> lastLoadedGames =
+            ConstData.bucket.readState(context, identifier: ValueKey(PageStorageKey(userName)));
+        futureGames = fetchGames(games: lastLoadedGames);
       });
-
-      log("Hmmmm", name: "MOJE_LOGI");
     } else {
-      log("EHHHHHHHHH", name: "MOJE_LOGI");
       futureGames = fetchGames();
     }
   }
@@ -139,18 +143,18 @@ class _UserScreen extends State<UserScreen> {
 
     if (game.primaryRune == -1 && game.secondRune == -1) {
       return Container(
-          color: baseTheme.primaryColor,
           alignment: Alignment.center,
           child: CircularProgressIndicator());
     }
     Color color = game.isWin ? Colors.green[400] : Colors.red[400];
     String gameResult = (game.isWin) ? "Win" : "Loss";
-    Image image = util.getChampionAvatar("Zed"); //TODO: champion id?
 
-    Widget createRow(
-        NetworkImage champIcon, int mainRune, int secondRune, KDA kda) {
+    Widget createRow({Game game}) {
       Widget avatarSection = CircleAvatar(
-        backgroundImage: image.image,
+        backgroundImage: util
+            .getChampionAvatar(
+            ConstData.championsIdsNames[game.championID.toString()])
+            .image,
         radius: CHAMP_AVATAR_SIZE,
       );
 
@@ -191,25 +195,6 @@ class _UserScreen extends State<UserScreen> {
             ],
           ));
 
-//      Widget nickAndCsSection = Container(
-//        padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
-//        child: FittedBox(
-//          fit: BoxFit.scaleDown,
-//          child: Column(
-//            children: <Widget>[
-//              Text(
-//                playerName,
-//                style: TextStyle(
-//                  color: Colors.black,
-//                  fontWeight: FontWeight.w600,
-//                  fontSize: 16.0,
-//                ),
-//              ),
-//              Text("CS: " + 123.toString(), style: TextStyle(fontSize: 12)),
-//            ],
-//          ),
-//        ),
-//      );
 
       Widget durationAndCsSection = Container(
         padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
@@ -227,28 +212,27 @@ class _UserScreen extends State<UserScreen> {
         ),
       );
 
-      String kdaRatio = kda.deaths > 0
+      String kdaRatio = game.kda.deaths > 0
           ? util
-              .roundDouble(((kda.kills + kda.assists) / kda.deaths), 2)
+              .roundDouble(
+                  ((game.kda.kills + game.kda.assists) / game.kda.deaths), 2)
               .toString()
-          : util.roundDouble(((kda.kills + kda.assists) / 1), 2).toString();
+          : util
+              .roundDouble(((game.kda.kills + game.kda.assists) / 1), 2)
+              .toString();
       Widget kdaSection = Container(
         padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Column(
             children: <Widget>[
-              Text(kda.toString()),
+              Text(game.kda.toString()),
               Text(kdaRatio.toString(), style: TextStyle(fontSize: 12)),
             ],
           ),
         ),
       );
 
-      Widget emptyItem = Opacity(
-        opacity: 0.7,
-        child: Container(color: Colors.grey),
-      );
 
       List<Widget> items = game.items
           .map((e) => e == 0
@@ -256,7 +240,7 @@ class _UserScreen extends State<UserScreen> {
                   padding: EdgeInsets.all(1),
                   width: CHAMP_AVATAR_SIZE,
                   height: CHAMP_AVATAR_SIZE,
-                  child: emptyItem)
+                  child: CustomWidgets.getEmtpyItem(context))
               : Container(
                   padding: EdgeInsets.all(1),
                   child: util.getItemIcon(e),
@@ -322,7 +306,7 @@ class _UserScreen extends State<UserScreen> {
             temp.add(currentGames[i]);
           }
         }
-        util.bucket.writeState(context, temp, identifier: ValueKey(util.mykey));
+        ConstData.bucket.writeState(context, temp, identifier: ValueKey(PageStorageKey(userName)));
       });
       Navigator.push(
           context,
@@ -332,47 +316,13 @@ class _UserScreen extends State<UserScreen> {
 
     return GestureDetector(
       onTap: () => openMatchStats(),
-      child: createRow(
-          NetworkImage(
-              'https://gamepedia.cursecdn.com/lolesports_gamepedia_en/4/4a/AsheSquare.png'),
-          //TODO
-          100, // TODO
-          100, // TODO
-          game.kda),
+      child: createRow(game: game),
     );
 
-//    return GestureDetector(
-//      onTap: () => Navigator.push(
-//          context, MaterialPageRoute(builder: (context) => GameStatsScreen())),
-//      child: Card(
-//        elevation: 5,
-//        child: Container(
-//          color: color,
-//          child: ListTile(
-//            leading: image,
-//            title: Container(
-//              child: Text((game.KDA['kills'].toString() +
-//                  '/' +
-//                  game.KDA['deaths'].toString() +
-//                  '/' +
-//                  game.KDA['assists'].toString())),
-//            ),
-//            subtitle: Text((game.gameDurationSecs ~/ 60).toString() +
-//                ":" +
-//                (game.gameDurationSecs % 60).toString().padLeft(2, '0')),
-//            trailing: Text(
-//              gameResult,
-//              style: MyTextStyles.gameResult,
-//            ),
-//          ),
-//        ),
-//      ),
-//    );
   }
 
   @override
   Widget build(BuildContext context) {
-    myTheme = Theme.of(context);
 
     // TODO: wczytywanie ikony dywizji
     String exampleDivisionIconLink =
@@ -475,7 +425,6 @@ class _UserScreen extends State<UserScreen> {
         );
 
     Widget mainInfoSection = Container(
-      color: baseTheme.primaryColor,
       alignment: Alignment.center,
       child: FutureBuilder<User>(
         future: futureUser,
@@ -512,48 +461,18 @@ class _UserScreen extends State<UserScreen> {
 
     Widget gamesList = Container(
       alignment: Alignment.center,
-      child: FutureBuilder<List<Game>>(
-        future: futureGames,
-        builder: (context, snapshot) {
-          if (currentGames.length != 0) {
-            return ListView.builder(
-              controller: _controller,
-              itemBuilder: (context, index) => _buildTile(currentGames[index]),
-              itemCount: currentGames.length,
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-                child: Container(child: Text(snapshot.error.toString())));
-          } else if (snapshot.connectionState != ConnectionState.done) {
-            return CircularProgressIndicator();
-          } else if (currentGames.length == 0) {
-            return Center(child: Container(child: Text("Empty")));
-          }
-//          }
-
-          return Center(child: Container(child: Text("unexpected")));
-//          else {
-//            if (currentGames.length != 0) {
-//              return ListView.builder(
-//                itemBuilder: (context, index) =>
-//                    _buildTile2(currentGames[index]),
-//                itemCount:
-//                currentGames.length,
-////                  (present <= _games.length) ? items.length + 1 : items.length,
-//              );
-//            }
-//          };
-        },
+      child: ListView.builder(
+        controller: _controller,
+        itemBuilder: (context, index) => _buildTile(currentGames[index]),
+        itemCount: currentGames.length,
       ),
     );
 
     Widget secondPart = DefaultTabController(
       length: 2,
       child: Container(
-        color: myTheme.primaryColor,
         child: Column(children: [
           TabBar(
-            labelColor: myTheme.accentColor,
             tabs: <Widget>[
               Tab(
                 text: "Match History",
@@ -566,8 +485,19 @@ class _UserScreen extends State<UserScreen> {
           Expanded(
             child: TabBarView(
               children: <Widget>[
-            PageStorage(
-            key: util.mykey, bucket: util.bucket, child: gamesList),
+                PageStorage(
+                    key: PageStorageKey(userName),
+                    bucket: ConstData.bucket,
+                    child: FutureBuilder(
+                      future: futureGames,
+                        builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return gamesList;
+                        } else if(snapshot.hasError) {
+                          return Text(snapshot.error.toString());
+                        }
+                        return Container(child: CircularProgressIndicator(),alignment: Alignment.center,);
+                        })),
                 Center(child: Text("Soon :)")),
               ],
             ),

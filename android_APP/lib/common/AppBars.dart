@@ -4,6 +4,7 @@ import '../common/themes.dart';
 
 AppBar baseAppBar(BuildContext context) {
     return AppBar(
+//      backgroundColor: baseTheme.scaffoldBackgroundColor,
       title: Text("LolStats"),
       actions: <Widget>[
         Padding(
