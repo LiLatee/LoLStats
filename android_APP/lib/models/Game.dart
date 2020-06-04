@@ -62,19 +62,25 @@ class Game {
 
 class PlayerData {
   String summonerName;
+  int championID;
   String accountID;
   int profileIcon;
   Stats stats;
   KDA kda;
+  List<dynamic> summonersSpells;
 
-  PlayerData({this.summonerName,
+  PlayerData({
+    this.summonerName,
+    this.championID,
     this.accountID,
     this.profileIcon,
     this.stats,
-    this.kda});
+    this.kda,
+    this.summonersSpells});
 
   PlayerData.fromJson(Map<String, dynamic> json) {
     summonerName = json['summonerName:'];
+    championID = json['championId:'];
     accountID = json['accountID:'];
     profileIcon = json['profileIcon:'];
     stats = json['stats'] != null ? new Stats.fromJson(json['stats']) : null;
@@ -82,19 +88,20 @@ class PlayerData {
         kills: json['KDA'].cast<int>()[0],
         deaths: json['KDA'].cast<int>()[1],
         assists: json['KDA'].cast<int>()[2]);
+    summonersSpells = json['s_spells'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['summonerName:'] = this.summonerName;
-    data['accountID:'] = this.accountID;
-    data['profileIcon:'] = this.profileIcon;
-    if (this.stats != null) {
-      data['stats'] = this.stats.toJson();
-    }
-    data['KDA'] = this.kda;
-    return data;
-  }
+//  Map<String, dynamic> toJson() {
+//    final Map<String, dynamic> data = new Map<String, dynamic>();
+//    data['summonerName:'] = this.summonerName;
+//    data['accountID:'] = this.accountID;
+//    data['profileIcon:'] = this.profileIcon;
+//    if (this.stats != null) {
+//      data['stats'] = this.stats.toJson();
+//    }
+//    data['KDA'] = this.kda;
+//    return data;
+//  }
 }
 
 class Stats {
@@ -202,7 +209,6 @@ class Stats {
   int statPerk0;
   int statPerk1;
   int statPerk2;
-  List<dynamic> summonerSpells;
 
   Stats({this.participantId,
     this.win,
@@ -307,8 +313,7 @@ class Stats {
     this.perkSubStyle,
     this.statPerk0,
     this.statPerk1,
-    this.statPerk2,
-    this.summonerSpells});
+    this.statPerk2});
 
   Stats.fromJson(Map<String, dynamic> json) {
     participantId = json['participantId'];
@@ -415,118 +420,117 @@ class Stats {
     statPerk0 = json['statPerk0'];
     statPerk1 = json['statPerk1'];
     statPerk2 = json['statPerk2'];
-    summonerSpells = json['s_spells'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['participantId'] = this.participantId;
-    data['win'] = this.win;
-    data['item0'] = this.item0;
-    data['item1'] = this.item1;
-    data['item2'] = this.item2;
-    data['item3'] = this.item3;
-    data['item4'] = this.item4;
-    data['item5'] = this.item5;
-    data['item6'] = this.item6;
-    data['kills'] = this.kills;
-    data['deaths'] = this.deaths;
-    data['assists'] = this.assists;
-    data['largestKillingSpree'] = this.largestKillingSpree;
-    data['largestMultiKill'] = this.largestMultiKill;
-    data['killingSprees'] = this.killingSprees;
-    data['longestTimeSpentLiving'] = this.longestTimeSpentLiving;
-    data['doubleKills'] = this.doubleKills;
-    data['tripleKills'] = this.tripleKills;
-    data['quadraKills'] = this.quadraKills;
-    data['pentaKills'] = this.pentaKills;
-    data['unrealKills'] = this.unrealKills;
-    data['totalDamageDealt'] = this.totalDamageDealt;
-    data['magicDamageDealt'] = this.magicDamageDealt;
-    data['physicalDamageDealt'] = this.physicalDamageDealt;
-    data['trueDamageDealt'] = this.trueDamageDealt;
-    data['largestCriticalStrike'] = this.largestCriticalStrike;
-    data['totalDamageDealtToChampions'] = this.totalDamageDealtToChampions;
-    data['magicDamageDealtToChampions'] = this.magicDamageDealtToChampions;
-    data['physicalDamageDealtToChampions'] =
-        this.physicalDamageDealtToChampions;
-    data['trueDamageDealtToChampions'] = this.trueDamageDealtToChampions;
-    data['totalHeal'] = this.totalHeal;
-    data['totalUnitsHealed'] = this.totalUnitsHealed;
-    data['damageSelfMitigated'] = this.damageSelfMitigated;
-    data['damageDealtToObjectives'] = this.damageDealtToObjectives;
-    data['damageDealtToTurrets'] = this.damageDealtToTurrets;
-    data['visionScore'] = this.visionScore;
-    data['timeCCingOthers'] = this.timeCCingOthers;
-    data['totalDamageTaken'] = this.totalDamageTaken;
-    data['magicalDamageTaken'] = this.magicalDamageTaken;
-    data['physicalDamageTaken'] = this.physicalDamageTaken;
-    data['trueDamageTaken'] = this.trueDamageTaken;
-    data['goldEarned'] = this.goldEarned;
-    data['goldSpent'] = this.goldSpent;
-    data['turretKills'] = this.turretKills;
-    data['inhibitorKills'] = this.inhibitorKills;
-    data['totalMinionsKilled'] = this.totalMinionsKilled;
-    data['neutralMinionsKilled'] = this.neutralMinionsKilled;
-    data['neutralMinionsKilledTeamJungle'] =
-        this.neutralMinionsKilledTeamJungle;
-    data['neutralMinionsKilledEnemyJungle'] =
-        this.neutralMinionsKilledEnemyJungle;
-    data['totalTimeCrowdControlDealt'] = this.totalTimeCrowdControlDealt;
-    data['champLevel'] = this.champLevel;
-    data['visionWardsBoughtInGame'] = this.visionWardsBoughtInGame;
-    data['sightWardsBoughtInGame'] = this.sightWardsBoughtInGame;
-    data['wardsPlaced'] = this.wardsPlaced;
-    data['wardsKilled'] = this.wardsKilled;
-    data['firstBloodKill'] = this.firstBloodKill;
-    data['firstBloodAssist'] = this.firstBloodAssist;
-    data['firstTowerKill'] = this.firstTowerKill;
-    data['firstTowerAssist'] = this.firstTowerAssist;
-    data['firstInhibitorKill'] = this.firstInhibitorKill;
-    data['firstInhibitorAssist'] = this.firstInhibitorAssist;
-    data['combatPlayerScore'] = this.combatPlayerScore;
-    data['objectivePlayerScore'] = this.objectivePlayerScore;
-    data['totalPlayerScore'] = this.totalPlayerScore;
-    data['totalScoreRank'] = this.totalScoreRank;
-    data['playerScore0'] = this.playerScore0;
-    data['playerScore1'] = this.playerScore1;
-    data['playerScore2'] = this.playerScore2;
-    data['playerScore3'] = this.playerScore3;
-    data['playerScore4'] = this.playerScore4;
-    data['playerScore5'] = this.playerScore5;
-    data['playerScore6'] = this.playerScore6;
-    data['playerScore7'] = this.playerScore7;
-    data['playerScore8'] = this.playerScore8;
-    data['playerScore9'] = this.playerScore9;
-    data['perk0'] = this.perk0;
-    data['perk0Var1'] = this.perk0Var1;
-    data['perk0Var2'] = this.perk0Var2;
-    data['perk0Var3'] = this.perk0Var3;
-    data['perk1'] = this.perk1;
-    data['perk1Var1'] = this.perk1Var1;
-    data['perk1Var2'] = this.perk1Var2;
-    data['perk1Var3'] = this.perk1Var3;
-    data['perk2'] = this.perk2;
-    data['perk2Var1'] = this.perk2Var1;
-    data['perk2Var2'] = this.perk2Var2;
-    data['perk2Var3'] = this.perk2Var3;
-    data['perk3'] = this.perk3;
-    data['perk3Var1'] = this.perk3Var1;
-    data['perk3Var2'] = this.perk3Var2;
-    data['perk3Var3'] = this.perk3Var3;
-    data['perk4'] = this.perk4;
-    data['perk4Var1'] = this.perk4Var1;
-    data['perk4Var2'] = this.perk4Var2;
-    data['perk4Var3'] = this.perk4Var3;
-    data['perk5'] = this.perk5;
-    data['perk5Var1'] = this.perk5Var1;
-    data['perk5Var2'] = this.perk5Var2;
-    data['perk5Var3'] = this.perk5Var3;
-    data['perkPrimaryStyle'] = this.perkPrimaryStyle;
-    data['perkSubStyle'] = this.perkSubStyle;
-    data['statPerk0'] = this.statPerk0;
-    data['statPerk1'] = this.statPerk1;
-    data['statPerk2'] = this.statPerk2;
-    return data;
-  }
+//  Map<String, dynamic> toJson() {
+//    final Map<String, dynamic> data = new Map<String, dynamic>();
+//    data['participantId'] = this.participantId;
+//    data['win'] = this.win;
+//    data['item0'] = this.item0;
+//    data['item1'] = this.item1;
+//    data['item2'] = this.item2;
+//    data['item3'] = this.item3;
+//    data['item4'] = this.item4;
+//    data['item5'] = this.item5;
+//    data['item6'] = this.item6;
+//    data['kills'] = this.kills;
+//    data['deaths'] = this.deaths;
+//    data['assists'] = this.assists;
+//    data['largestKillingSpree'] = this.largestKillingSpree;
+//    data['largestMultiKill'] = this.largestMultiKill;
+//    data['killingSprees'] = this.killingSprees;
+//    data['longestTimeSpentLiving'] = this.longestTimeSpentLiving;
+//    data['doubleKills'] = this.doubleKills;
+//    data['tripleKills'] = this.tripleKills;
+//    data['quadraKills'] = this.quadraKills;
+//    data['pentaKills'] = this.pentaKills;
+//    data['unrealKills'] = this.unrealKills;
+//    data['totalDamageDealt'] = this.totalDamageDealt;
+//    data['magicDamageDealt'] = this.magicDamageDealt;
+//    data['physicalDamageDealt'] = this.physicalDamageDealt;
+//    data['trueDamageDealt'] = this.trueDamageDealt;
+//    data['largestCriticalStrike'] = this.largestCriticalStrike;
+//    data['totalDamageDealtToChampions'] = this.totalDamageDealtToChampions;
+//    data['magicDamageDealtToChampions'] = this.magicDamageDealtToChampions;
+//    data['physicalDamageDealtToChampions'] =
+//        this.physicalDamageDealtToChampions;
+//    data['trueDamageDealtToChampions'] = this.trueDamageDealtToChampions;
+//    data['totalHeal'] = this.totalHeal;
+//    data['totalUnitsHealed'] = this.totalUnitsHealed;
+//    data['damageSelfMitigated'] = this.damageSelfMitigated;
+//    data['damageDealtToObjectives'] = this.damageDealtToObjectives;
+//    data['damageDealtToTurrets'] = this.damageDealtToTurrets;
+//    data['visionScore'] = this.visionScore;
+//    data['timeCCingOthers'] = this.timeCCingOthers;
+//    data['totalDamageTaken'] = this.totalDamageTaken;
+//    data['magicalDamageTaken'] = this.magicalDamageTaken;
+//    data['physicalDamageTaken'] = this.physicalDamageTaken;
+//    data['trueDamageTaken'] = this.trueDamageTaken;
+//    data['goldEarned'] = this.goldEarned;
+//    data['goldSpent'] = this.goldSpent;
+//    data['turretKills'] = this.turretKills;
+//    data['inhibitorKills'] = this.inhibitorKills;
+//    data['totalMinionsKilled'] = this.totalMinionsKilled;
+//    data['neutralMinionsKilled'] = this.neutralMinionsKilled;
+//    data['neutralMinionsKilledTeamJungle'] =
+//        this.neutralMinionsKilledTeamJungle;
+//    data['neutralMinionsKilledEnemyJungle'] =
+//        this.neutralMinionsKilledEnemyJungle;
+//    data['totalTimeCrowdControlDealt'] = this.totalTimeCrowdControlDealt;
+//    data['champLevel'] = this.champLevel;
+//    data['visionWardsBoughtInGame'] = this.visionWardsBoughtInGame;
+//    data['sightWardsBoughtInGame'] = this.sightWardsBoughtInGame;
+//    data['wardsPlaced'] = this.wardsPlaced;
+//    data['wardsKilled'] = this.wardsKilled;
+//    data['firstBloodKill'] = this.firstBloodKill;
+//    data['firstBloodAssist'] = this.firstBloodAssist;
+//    data['firstTowerKill'] = this.firstTowerKill;
+//    data['firstTowerAssist'] = this.firstTowerAssist;
+//    data['firstInhibitorKill'] = this.firstInhibitorKill;
+//    data['firstInhibitorAssist'] = this.firstInhibitorAssist;
+//    data['combatPlayerScore'] = this.combatPlayerScore;
+//    data['objectivePlayerScore'] = this.objectivePlayerScore;
+//    data['totalPlayerScore'] = this.totalPlayerScore;
+//    data['totalScoreRank'] = this.totalScoreRank;
+//    data['playerScore0'] = this.playerScore0;
+//    data['playerScore1'] = this.playerScore1;
+//    data['playerScore2'] = this.playerScore2;
+//    data['playerScore3'] = this.playerScore3;
+//    data['playerScore4'] = this.playerScore4;
+//    data['playerScore5'] = this.playerScore5;
+//    data['playerScore6'] = this.playerScore6;
+//    data['playerScore7'] = this.playerScore7;
+//    data['playerScore8'] = this.playerScore8;
+//    data['playerScore9'] = this.playerScore9;
+//    data['perk0'] = this.perk0;
+//    data['perk0Var1'] = this.perk0Var1;
+//    data['perk0Var2'] = this.perk0Var2;
+//    data['perk0Var3'] = this.perk0Var3;
+//    data['perk1'] = this.perk1;
+//    data['perk1Var1'] = this.perk1Var1;
+//    data['perk1Var2'] = this.perk1Var2;
+//    data['perk1Var3'] = this.perk1Var3;
+//    data['perk2'] = this.perk2;
+//    data['perk2Var1'] = this.perk2Var1;
+//    data['perk2Var2'] = this.perk2Var2;
+//    data['perk2Var3'] = this.perk2Var3;
+//    data['perk3'] = this.perk3;
+//    data['perk3Var1'] = this.perk3Var1;
+//    data['perk3Var2'] = this.perk3Var2;
+//    data['perk3Var3'] = this.perk3Var3;
+//    data['perk4'] = this.perk4;
+//    data['perk4Var1'] = this.perk4Var1;
+//    data['perk4Var2'] = this.perk4Var2;
+//    data['perk4Var3'] = this.perk4Var3;
+//    data['perk5'] = this.perk5;
+//    data['perk5Var1'] = this.perk5Var1;
+//    data['perk5Var2'] = this.perk5Var2;
+//    data['perk5Var3'] = this.perk5Var3;
+//    data['perkPrimaryStyle'] = this.perkPrimaryStyle;
+//    data['perkSubStyle'] = this.perkSubStyle;
+//    data['statPerk0'] = this.statPerk0;
+//    data['statPerk1'] = this.statPerk1;
+//    data['statPerk2'] = this.statPerk2;
+//    return data;
+//  }
 }

@@ -1,12 +1,12 @@
-//import 'package:flutter/cupertino.dart';
-//import 'package:flutter/material.dart';
-//import 'package:lolstats/common/CustomWidgets.dart' as CustomWidgets;
-//import 'package:lolstats/common/themes.dart';
-//import 'package:lolstats/models/KDA.dart';
-//import 'package:lolstats/common/AppColors.dart' as AppColors;
-//import 'package:lolstats/common/AppBars.dart' as AppBars;
-//import 'package:lolstats/models/PlayerGameStats.dart';
-//import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:lolstats/common/CustomWidgets.dart' as CustomWidgets;
+import 'package:lolstats/common/themes.dart';
+import 'package:lolstats/models/KDA.dart';
+import 'package:lolstats/common/AppColors.dart' as AppColors;
+import 'package:lolstats/common/AppBars.dart' as AppBars;
+import 'package:lolstats/models/PlayerGameStats.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 //
 //class GameStatsTableScreen extends StatefulWidget {
 //  @override
@@ -177,88 +177,88 @@
 //  }
 //}
 
-///// Bar chart example
-//class StackedHorizontalBarChart extends StatelessWidget {
-//  final List<charts.Series> seriesList;
-//  final bool animate;
-//
-//  StackedHorizontalBarChart(this.seriesList, {this.animate});
-//
-//  /// Creates a stacked [BarChart] with sample data and no transition.
-//  factory StackedHorizontalBarChart.withSampleData() {
-//    return new StackedHorizontalBarChart(
-//      _createSampleData(),
-//      // Disable animations for image tests.
-//      animate: false,
-//    );
-//  }
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    // For horizontal bar charts, set the [vertical] flag to false.
-//    return new charts.BarChart(
-//      seriesList,
-//      animate: animate,
-//      barGroupingType: charts.BarGroupingType.grouped,
-//      vertical: false,
-//    );
-//  }
-//
+/// Bar chart example
+class StackedHorizontalBarChart extends StatelessWidget {
+  final List<charts.Series> seriesList;
+  final bool animate;
 
-//
-//  /// Create series list with multiple series
-//  static List<charts.Series<OrdinalSales, String>> _createSampleData() {
-//    NetworkImage asheIcon = NetworkImage(
-//        'https://gamepedia.cursecdn.com/lolesports_gamepedia_en/4/4a/AsheSquare.png');
-//    final desktopSalesData = [
-//      new OrdinalSales('2014', 5, image: asheIcon),
-//      new OrdinalSales('2015', 25, image: asheIcon),
-//      new OrdinalSales('2016', 100, image: asheIcon),
-//      new OrdinalSales('2017', 75, image: asheIcon),
-//    ];
-//
-//    final tableSalesData = [
-//      new OrdinalSales('2014', 25, image: asheIcon),
-//      new OrdinalSales('2015', 50, image: asheIcon),
-//      new OrdinalSales('2016', 10, image: asheIcon),
-//      new OrdinalSales('2017', 20, image: asheIcon),
-//    ];
-//
-//    final mobileSalesData = [
-//      new OrdinalSales('2014', 10, image: asheIcon),
-//      new OrdinalSales('2015', 15, image: asheIcon),
-//      new OrdinalSales('2016', 50, image: asheIcon),
-//      new OrdinalSales('2017', 45, image: asheIcon),
-//    ];
-//
-//    return [
-//      new charts.Series<OrdinalSales, String>(
-//        id: 'Desktop',
-//        domainFn: (OrdinalSales sales, _) => sales.year,
-//        measureFn: (OrdinalSales sales, _) => sales.sales,
-//        data: desktopSalesData,
-//      ),
-//      new charts.Series<OrdinalSales, String>(
-//        id: 'Tablet',
-//        domainFn: (OrdinalSales sales, _) => sales.year,
-//        measureFn: (OrdinalSales sales, _) => sales.sales,
-//        data: tableSalesData,
-//      ),
-//      new charts.Series<OrdinalSales, String>(
-//        id: 'Mobile',
-//        domainFn: (OrdinalSales sales, _) => sales.year,
-//        measureFn: (OrdinalSales sales, _) => sales.sales,
-//        data: mobileSalesData,
-//      ),
-//    ];
-//  }
-//}
-//
-///// Sample ordinal data type.
-//class OrdinalSales {
-//  final String year;
-//  final int sales;
-//  final NetworkImage image;
-//
-//  OrdinalSales(this.year, this.sales, {this.image = null});
-//}
+  StackedHorizontalBarChart(this.seriesList, {this.animate});
+
+  /// Creates a stacked [BarChart] with sample data and no transition.
+  factory StackedHorizontalBarChart.withSampleData() {
+    return new StackedHorizontalBarChart(
+      _createSampleData(),
+      // Disable animations for image tests.
+      animate: false,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // For horizontal bar charts, set the [vertical] flag to false.
+    return new charts.BarChart(
+      seriesList,
+      animate: animate,
+      barGroupingType: charts.BarGroupingType.grouped,
+      vertical: false,
+    );
+  }
+
+
+
+  /// Create series list with multiple series
+  static List<charts.Series<OrdinalSales, String>> _createSampleData() {
+    NetworkImage asheIcon = NetworkImage(
+        'https://gamepedia.cursecdn.com/lolesports_gamepedia_en/4/4a/AsheSquare.png');
+    final desktopSalesData = [
+      new OrdinalSales('2014', 5, image: asheIcon),
+      new OrdinalSales('2015', 25, image: asheIcon),
+      new OrdinalSales('2016', 100, image: asheIcon),
+      new OrdinalSales('2017', 75, image: asheIcon),
+    ];
+
+    final tableSalesData = [
+      new OrdinalSales('2014', 25, image: asheIcon),
+      new OrdinalSales('2015', 50, image: asheIcon),
+      new OrdinalSales('2016', 10, image: asheIcon),
+      new OrdinalSales('2017', 20, image: asheIcon),
+    ];
+
+    final mobileSalesData = [
+      new OrdinalSales('2014', 10, image: asheIcon),
+      new OrdinalSales('2015', 15, image: asheIcon),
+      new OrdinalSales('2016', 50, image: asheIcon),
+      new OrdinalSales('2017', 45, image: asheIcon),
+    ];
+
+    return [
+      new charts.Series<OrdinalSales, String>(
+        id: 'Desktop',
+        domainFn: (OrdinalSales sales, _) => sales.year,
+        measureFn: (OrdinalSales sales, _) => sales.sales,
+        data: desktopSalesData,
+      ),
+      new charts.Series<OrdinalSales, String>(
+        id: 'Tablet',
+        domainFn: (OrdinalSales sales, _) => sales.year,
+        measureFn: (OrdinalSales sales, _) => sales.sales,
+        data: tableSalesData,
+      ),
+      new charts.Series<OrdinalSales, String>(
+        id: 'Mobile',
+        domainFn: (OrdinalSales sales, _) => sales.year,
+        measureFn: (OrdinalSales sales, _) => sales.sales,
+        data: mobileSalesData,
+      ),
+    ];
+  }
+}
+
+/// Sample ordinal data type.
+class OrdinalSales {
+  final String year;
+  final int sales;
+  final NetworkImage image;
+
+  OrdinalSales(this.year, this.sales, {this.image = null});
+}
