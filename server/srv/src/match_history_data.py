@@ -4,7 +4,7 @@ import pandas as pd
 from pandas import json_normalize
 
 # https://developer.riotgames.com/
-KEY= "RGAPI-00162eb9-f6d3-4994-b66a-51fb5501e41a"
+KEY= "RGAPI-5e6d6bbb-3fd8-433a-b6c1-694ce2afa4ee"
 
 
 
@@ -64,7 +64,7 @@ def get_match_for_matchid(matchid):
 def get_champion_name(champ_id,champs):
     return champs.loc[champs['key']==champ_id]['id'].iat[0]
 
-def get_game_data(match_data,account_id):
+def get_game_data(match_data,account_id,queue):
 
     game_data = dict()
     
@@ -75,26 +75,28 @@ def get_game_data(match_data,account_id):
     players_data = dict()
     
     main_player_id_from_game = 1
-    
-    for player in match_data['participantIdentities']:
-        if player['player']["currentAccountId"] == account_id:
-            main_player_id_from_game = player['participantId']
-        players_data[player['participantId']] = dict()
-        players_data[player['participantId']]['summonerName:']= player['player']["summonerName"]
-        players_data[player['participantId']]['accountID:']= player['player']["currentAccountId"]
-        players_data[player['participantId']]['profileIcon:']= player['player']["profileIcon"]
 
     for player in match_data['participants']:
-        players_data[player['participantId']]['stats'] = player['stats']
+        players_data[player['participantId']] = dict()
+        players_data[player['participantId']] = player['stats']
         kills = player['stats']['kills']
         assists = player['stats']['assists']
         deaths = player['stats']['deaths']
         players_data[player['participantId']]['KDA'] = [kills,deaths,assists]
-        players_data[player['participantId']]['championId:']= player["championId"]
+        players_data[player['participantId']]['championId']= player["championId"]
         players_data[player['participantId']]['s_spells']= [player["spell1Id"],player["spell2Id"]]
 
+    for player in match_data['participantIdentities']:
+        if player['player']["currentAccountId"] == account_id:
+            main_player_id_from_game = player['participantId']
+        players_data[player['participantId']]['summonerName']= player['player']["summonerName"]
+        players_data[player['participantId']]['accountID']= player['player']["currentAccountId"]
+        players_data[player['participantId']]['profileIcon']= player['player']["profileIcon"]
+
+    
 
     base_data = get_base_data_data_for_player(match_data,main_player_id_from_game)
+    base_data['queue'] = queue
     base_data['KDA'] = players_data[main_player_id_from_game]['KDA']
     base_data['s_spells'] = players_data[main_player_id_from_game]['s_spells']
 
@@ -124,7 +126,7 @@ def get_base_data_data_for_player(match_data,main_player_id_from_game):
             
     base_data['items'] = items
     base_data['totalMinionsKilled'] = match_data['participants'][main_player_id_from_game-1]['stats']['totalMinionsKilled']     
-    
+    base_data['summonerName'] = match_data['participantIdentities'][main_player_id_from_game-1]['player']['summonerName']
     base_data['perks'] = [match_data['participants'][main_player_id_from_game-1]['stats']['perk0'],
                           match_data['participants'][main_player_id_from_game-1]['stats']['perkSubStyle']]    
     base_data['championId'] = match_data['participants'][main_player_id_from_game-1]['championId']    
@@ -134,14 +136,15 @@ def get_base_data_data_for_player(match_data,main_player_id_from_game):
 
 def get_n_match_history_games_for_player(summonername,index_begin, champion,n_games=10):
     summoner_data=get_summoner_data_by_name(summonername)
-    print(summoner_data)
+    # print(summoner_data)
     account_id =summoner_data['accountId']
     history = get_history_for_player_id(account_id,champion_id=champion,endIndex=index_begin+n_games,beginIndex=index_begin)
     match_history = []
     for game in range(0,n_games):
 #         print("GAME_{0}".format(game))
         match_data = get_match_for_matchid(history['matches'][game]['gameId'])
-        analyzed_data = get_game_data(match_data,account_id)
+        queue = history['matches'][game]['queue']
+        analyzed_data = get_game_data(match_data,account_id,queue)
         match_history.append(analyzed_data)
         
     return json.dumps(match_history)
@@ -151,7 +154,12 @@ def get_ranked_data_for_sum_id(sum_id):
     rank_data_url = "https://eun1.api.riotgames.com/lol/league/v4/entries/by-summoner/{0}".format(sum_id)
     r = requests.get(url = rank_data_url,headers=header) 
     data = r.json()
-    return data
+    queues = dict()
+    for d in data:
+        queues[d['queueType']] = d
+    return queues
+
+
 
 def get_profile_info_for_player(summonername):
     summoner_data=get_summoner_data_by_name(summonername)
@@ -168,15 +176,8 @@ def get_profile_info_for_player(summonername):
 def get_all_champions_data_patch(patch):
     if patch is None:
         patch = '10.1.1'
-        print("CO JEST")
-
-    print(type(patch))
-    print(patch)
-    champs_url = "http://ddragon.leagueoflegends.com/cdn/{0}/data/en_US/champion.json".format(patch)
-    
+    champs_url = "http://ddragon.leagueoflegends.com/cdn/{0}/data/en_US/champion.json".format(patch)    
     r = requests.get(url = champs_url) 
-    print("rrrr: ", champs_url)
-    print("rrrr: ", str(r))
     champions_data = r.json()
     champs=pd.DataFrame.from_dict(champions_data.values())
     champions = to_df(champs[0][3])
@@ -215,7 +216,11 @@ def generate_perks_ids():
     r = requests.get(url = runes_url) 
     runes_json = r.json()
     runes = dict()
+    perks_with_path = dict()
     for rune in runes_json:
+        r = dict()
+        r['name'] = rune['name']
+        r['path'] = rune['iconPath']
+        perks_with_path[rune['id']] = r
         runes[rune['id']] = rune['name']
-    return runes
-        
+    return runes,perks_with_path
