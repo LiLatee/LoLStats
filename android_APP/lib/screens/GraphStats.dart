@@ -23,54 +23,70 @@ class GraphStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double ROW_HEIGHT = 40 * DeviceSizes.getScaleFactor(context: context);
+
     Widget getIcon({String champName, Color color}) {
       return CircleAvatar(
         backgroundColor: color,
-        radius: DeviceSizes.getPercentOfWidth(context: context, percent: 0.055),
+        radius: ROW_HEIGHT / 2,
         child: CircleAvatar(
           backgroundImage: util.getChampionAvatar(champName).image,
-          radius:
-              DeviceSizes.getPercentOfWidth(context: context, percent: 0.05),
+          radius: (ROW_HEIGHT / 2) * 0.9,
         ),
       );
     }
 
     Widget getValueText({int value}) {
-      return Container(
-        padding: EdgeInsets.only(left: 5),
-        child: Text(
-          value.toString(),
-          style: TextStyle(color: Colors.white),
+      return Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+          padding: EdgeInsets.only(left: 5),
+          child: Text(
+            value.toString(),
+            style: TextStyle(color: Colors.white, fontSize: 14*DeviceSizes.getScaleFactor(context: context)),
+          ),
         ),
       );
     }
 
     Widget getBar({int value, Color color}) {
-      return AnimatedContainer(
-        duration: Duration(seconds: 1),
-        margin: EdgeInsets.only(left: 5),
-        color: color,
-        height: 5,
-        width: DeviceSizes.getPercentOfWidth(
-            context: context, percent: 0.8 * value / maxValue),
+      return Align(
+        alignment: Alignment.topLeft,
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 750),
+          margin: EdgeInsets.only(left: 5),
+          height: 5 * DeviceSizes.getScaleFactor(context: context),
+          width: DeviceSizes.getPercentOfWidth(
+              context: context, percent: 0.8 * value / maxValue),
+          decoration: new BoxDecoration(
+              color: color,
+              borderRadius: new BorderRadius.only(
+                bottomRight: const Radius.circular(10),
+                topRight: const Radius.circular(10),
+              )),
+        ),
       );
     }
 
     Widget createRow({int value, int champID, int playerIndex}) {
       Color color = playerIndex < 5 ? Colors.blue : Colors.red;
-      if (playerIndex == currentUserIndex ) { color = Colors.amberAccent;}
-      
+      if (playerIndex == currentUserIndex) {
+        color = Colors.amberAccent;
+      }
+
       return Container(
         margin: EdgeInsets.only(top: 5, bottom: 5),
         width: DeviceSizes.getWidth(context: context),
-        height: DeviceSizes.getPercentOfWidth(context: context, percent: 0.11),
+        height: ROW_HEIGHT,
         child: Row(
           children: <Widget>[
-            getIcon(champName: ConstData.championsIdsNames[champID.toString()], color: color),
+            getIcon(
+                champName: ConstData.championsIdsNames[champID.toString()],
+                color: color),
             Column(
               children: <Widget>[
-                getValueText(value: value),
-                getBar(value: value, color: color),
+                Expanded(child: getValueText(value: value)),
+                Expanded(child: getBar(value: value, color: color)),
               ],
             ),
           ],
@@ -80,11 +96,13 @@ class GraphStats extends StatelessWidget {
 
     List<Widget> createListOfRows() {
       List<Widget> result = List<Widget>();
-      for (var i=0; i<values.length; i++) {
-        result.add(createRow(value: values[i], champID: champsIds[i], playerIndex: i));
+      for (var i = 0; i < values.length; i++) {
+        result.add(
+            createRow(value: values[i], champID: champsIds[i], playerIndex: i));
       }
       return result;
     }
+
     return Column(
       children: createListOfRows(),
     );

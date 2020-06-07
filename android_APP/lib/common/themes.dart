@@ -23,7 +23,7 @@ final baseTheme = ThemeData(
 //  accentColor: Color(0xff8bbabb),404b80
   primaryColor: Color(0xff404b80),
   accentColor: Colors.cyan[500],
-  canvasColor: Color(0xff8698b5),
+  canvasColor: Color(0xff4d5869),
   textTheme: TextTheme(
     headline2: TextStyle(
       fontSize: 22.0,

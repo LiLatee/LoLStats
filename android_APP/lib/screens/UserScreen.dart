@@ -19,12 +19,12 @@ import 'package:lolstats/common/ConstData.dart' as ConstData;
 //https://eune.leagueoflegends.com/pl-pl/news/game-updates/patch-10-11-notes/
 
 class UserScreen extends StatefulWidget {
-  final String userName;
+  final String summonerName;
 
-  UserScreen({Key key, @required this.userName}) : super(key: key);
+  UserScreen({Key key, @required this.summonerName}) : super(key: key);
 
   @override
-  _UserScreen createState() => _UserScreen(currentSummonerName: userName);
+  _UserScreen createState() => _UserScreen(currentSummonerName: summonerName);
 }
 
 class _UserScreen extends State<UserScreen> {
@@ -102,8 +102,9 @@ class _UserScreen extends State<UserScreen> {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
       setState(() {
-        if (!(currentGames[currentGames.length - 1].primaryRune == -1) &&
-            !(currentGames[currentGames.length - 1].secondRune == -1)) {
+        // TODO PERK ZMIENIĆ
+        if (!(currentGames[currentGames.length - 1].primaryPerkID == -1) &&
+            !(currentGames[currentGames.length - 1].primaryPerkID == -1)) {
           currentGames.add(Game.dummy());
         }
         futureGames = fetchGames(progressIndicator: true);
@@ -141,7 +142,7 @@ class _UserScreen extends State<UserScreen> {
     const double CHAMP_AVATAR_SIZE = 27.0;
     const double EDGE_INSECTS_IN_TEAMS_INFO = 8.0;
 
-    if (game.primaryRune == -1 && game.secondRune == -1) {
+    if (game.primaryPerkID == -1 && game.secondPerkID == -1) {
       return Container(
           alignment: Alignment.center,
           child: CircularProgressIndicator());
@@ -165,16 +166,16 @@ class _UserScreen extends State<UserScreen> {
               Column(
                 children: <Widget>[
                   Container(
+                    padding: EdgeInsets.all(1),
                     height: CHAMP_AVATAR_SIZE,
                     width: CHAMP_AVATAR_SIZE,
-                    child: Image.network(
-                        'https://vignette.wikia.nocookie.net/leagueoflegends/images/7/74/Flash.png/revision/latest?cb=20180514003149'),
+                    child: util.getSummonerSpellIcon(game.firstSummonerSpellID),
                   ),
                   Container(
+                    padding: EdgeInsets.all(1),
                     height: CHAMP_AVATAR_SIZE,
                     width: CHAMP_AVATAR_SIZE,
-                    child: Image.network(
-                        'https://vignette.wikia.nocookie.net/leagueoflegends/images/f/f4/Ignite.png/revision/latest?cb=20180514003345'),
+                    child: util.getSummonerSpellIcon(game.secondSummonerSpellID),
                   ),
                 ],
               ),
@@ -183,12 +184,12 @@ class _UserScreen extends State<UserScreen> {
                   CircleAvatar(
                     backgroundColor: Colors.transparent,
                     radius: CHAMP_AVATAR_SIZE / 2,
-                    child: util.getChampionAvatar("Ezreal"),
+                    child: util.getPerkIcon(game.primaryPerkID),
                   ),
                   CircleAvatar(
                     backgroundColor: Colors.transparent,
                     radius: CHAMP_AVATAR_SIZE / 2,
-                    child: util.getChampionAvatar("Caitlyn"),
+                    child: util.getPerkIcon(game.secondPerkID),
                   ),
                 ],
               ),
@@ -310,7 +311,7 @@ class _UserScreen extends State<UserScreen> {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => GameStatsPlayersTableScreen(game: game, currentSummonerName: currentSummonerName,)));
+              builder: (context) => GameStatsPlayersTableScreen(game: game,)));
     }
 
     return GestureDetector(
@@ -397,18 +398,15 @@ class _UserScreen extends State<UserScreen> {
                     children: <Widget>[
                       getGamesStatsText(
                           "Solo/Duo: ",
-                          user.queuesData[0].wins,
-                          user.queuesData[0].losses,
-                          // TODO: zastąpić 0 przez SOLO/DUO itd.
-                          user.queuesData[0].tier + " " + user.queuesData[0].rank,
+                          user.rankedSoloDuo5x5.wins,
+                          user.rankedSoloDuo5x5.losses,
+                          user.rankedSoloDuo5x5.tier + " " + user.rankedSoloDuo5x5.rank,
                           exampleDivisionIconLink),
                       getGamesStatsText(
                           "Flex: ",
-                          user.queuesData[1].wins,
-                          user.queuesData[1].losses,
-                          user.queuesData[1].tier +
-                              " " +
-                              user.queuesData[1].rank,
+                          user.rankedFlex5x5.wins,
+                          user.rankedFlex5x5.losses,
+                          user.rankedFlex5x5.tier + " " + user.rankedFlex5x5.rank,
                           exampleDivisionIconLink),
                       getGamesStatsText(
                           "Normal: ", normalWins, normalLosses, "", null),

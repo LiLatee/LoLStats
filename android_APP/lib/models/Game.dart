@@ -78,7 +78,9 @@ class PlayerData {
   String accountID;
   int profileIcon;
   KDA kda;
-  List<dynamic> summonersSpells;
+  int firstSummonerSpellID;
+  int secondSummonerSpellID;
+//  List<dynamic> summonersSpells;
   int participantId;
   bool win;
   int item0;
@@ -191,7 +193,8 @@ class PlayerData {
     this.accountID,
     this.profileIcon,
     this.kda,
-    this.summonersSpells,
+    this.firstSummonerSpellID,
+    this.secondSummonerSpellID,
     this.participantId,
     this.win,
     this.item0,
@@ -306,7 +309,8 @@ class PlayerData {
         kills: json['KDA'].cast<int>()[0],
         deaths: json['KDA'].cast<int>()[1],
         assists: json['KDA'].cast<int>()[2]);
-    summonersSpells = json['s_spells'];
+    firstSummonerSpellID = json['s_spells'][0];
+    secondSummonerSpellID = json['s_spells'][1];
     participantId = json['participantId'];
     win = json['win'];
     item0 = json['item0'];
