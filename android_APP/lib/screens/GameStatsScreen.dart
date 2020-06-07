@@ -16,20 +16,18 @@ import 'package:lolstats/common/DeviceSizes.dart' as DeviceSizes;
 
 class GameStatsPlayersTableScreen extends StatefulWidget {
   final Game game;
-  final String currentSummonerName;
 
-  GameStatsPlayersTableScreen({this.game, this.currentSummonerName});
+  GameStatsPlayersTableScreen({this.game});
 
   @override
   _GameStatsPlayersTableScreenState createState() =>
-      _GameStatsPlayersTableScreenState(
-          game: this.game, currentSummonerName: currentSummonerName);
+      _GameStatsPlayersTableScreenState(game: this.game);
 }
 
 class _GameStatsPlayersTableScreenState
     extends State<GameStatsPlayersTableScreen> {
   final Game game;
-  final String currentSummonerName;
+
   String dropdownValue = 'Damage Dealt';
   List<int> values;
   List<int> champsIds;
@@ -42,11 +40,11 @@ class _GameStatsPlayersTableScreenState
     'Vision Score'
   ];
 
-  _GameStatsPlayersTableScreenState({this.game, this.currentSummonerName}) {
+  _GameStatsPlayersTableScreenState({this.game}) {
     champsIds = game.playersData.map<int>((e) => e.championID).toList();
 
-    currentSummonerChampID = game.playersData.indexWhere((e) =>
-        e.summonerName.toLowerCase() == currentSummonerName.toLowerCase());
+    currentSummonerChampID = game.playersData.indexWhere(
+        (e) => e.summonerName.toLowerCase() == game.summonerName.toLowerCase());
 
     setValuesForGraph(dropdownValue);
   }
@@ -54,17 +52,17 @@ class _GameStatsPlayersTableScreenState
   void setValuesForGraph(String chosenStat) {
     if (chosenStat == statsList[0]) {
       values = game.playersData
-          .map<int>((e) => e.stats.totalDamageDealtToChampions)
+          .map<int>((e) => e.totalDamageDealtToChampions)
           .toList();
     } else if (chosenStat == statsList[1]) {
       values =
-          game.playersData.map<int>((e) => e.stats.totalDamageTaken).toList();
+          game.playersData.map<int>((e) => e.totalDamageTaken).toList();
     } else if (chosenStat == statsList[2]) {
-      values = game.playersData.map<int>((e) => e.stats.totalHeal).toList();
+      values = game.playersData.map<int>((e) => e.totalHeal).toList();
     } else if (chosenStat == statsList[3]) {
-      values = game.playersData.map<int>((e) => e.stats.goldEarned).toList();
+      values = game.playersData.map<int>((e) => e.goldEarned).toList();
     } else if (chosenStat == statsList[4]) {
-      values = game.playersData.map<int>((e) => e.stats.visionScore).toList();
+      values = game.playersData.map<int>((e) => e.visionScore).toList();
     }
   }
 
@@ -75,7 +73,7 @@ class _GameStatsPlayersTableScreenState
 
     Widget createRow({PlayerData player}) {
       Color color =
-          player.summonerName.toLowerCase() == currentSummonerName.toLowerCase()
+          player.summonerName.toLowerCase() == game.summonerName.toLowerCase()
               ? Colors.amberAccent
               : Colors.transparent;
 
@@ -87,7 +85,7 @@ class _GameStatsPlayersTableScreenState
               .getChampionAvatar(
                   ConstData.championsIdsNames[player.championID.toString()])
               .image,
-          radius: CHAMP_AVATAR_SIZE-2,
+          radius: CHAMP_AVATAR_SIZE - 2,
         ),
       );
 
@@ -147,7 +145,7 @@ class _GameStatsPlayersTableScreenState
                 builder: (context) => Scaffold(
                       appBar: AppBars.baseAppBar(context),
                       body: UserScreen(
-                        userName: player.summonerName,
+                        summonerName: player.summonerName,
                       ),
                     ))),
         child: Container(
@@ -178,7 +176,7 @@ class _GameStatsPlayersTableScreenState
                       style: TextStyle(
                           fontSize: 12.0, fontWeight: FontWeight.bold)),
                   Text("\t"),
-                  Text("cs: " + player.stats.totalMinionsKilled.toString(),
+                  Text("cs: " + player.totalMinionsKilled.toString(),
                       style: TextStyle(fontSize: 12)),
                 ],
               ),
@@ -188,13 +186,13 @@ class _GameStatsPlayersTableScreenState
       );
 
       List<int> itemsID = [
-        player.stats.item0,
-        player.stats.item1,
-        player.stats.item2,
-        player.stats.item3,
-        player.stats.item4,
-        player.stats.item5,
-        player.stats.item6,
+        player.item0,
+        player.item1,
+        player.item2,
+        player.item3,
+        player.item4,
+        player.item5,
+        player.item6,
       ];
 
       Widget itemsSection = Container(
@@ -218,7 +216,7 @@ class _GameStatsPlayersTableScreenState
       );
 
       return Container(
-        height: (CHAMP_AVATAR_SIZE + 5)*2,
+        height: (CHAMP_AVATAR_SIZE + 5) * 2,
         child: Stack(
           children: <Widget>[
             LayoutBuilder(
@@ -335,10 +333,7 @@ class _GameStatsPlayersTableScreenState
                   child: TabBarView(
                     children: <Widget>[
                       mainTable,
-                      GameStatsTableScreen(
-                        game: game,
-                        currentSummonerName: currentSummonerName,
-                      ),
+                      GameStatsTableScreen(game: game),
                       graphPage,
                     ],
                   ),
@@ -354,20 +349,18 @@ class _GameStatsPlayersTableScreenState
 
 class GameStatsTableScreen extends StatefulWidget {
   final Game game;
-  final String currentSummonerName;
 
-  GameStatsTableScreen({this.game, this.currentSummonerName});
+  GameStatsTableScreen({this.game});
 
   @override
   _GameStatsTableScreenState createState() => _GameStatsTableScreenState(
-      game: game, currentSummonerName: currentSummonerName);
+      game: game);
 }
 
 class _GameStatsTableScreenState extends State<GameStatsTableScreen> {
   final Game game;
-  final String currentSummonerName;
 
-  _GameStatsTableScreenState({this.game, this.currentSummonerName});
+  _GameStatsTableScreenState({this.game});
 
   List<PlayerGameStats> playersList;
 
@@ -438,7 +431,7 @@ class _GameStatsTableScreenState extends State<GameStatsTableScreen> {
                                   child: CircleAvatar(
                                     backgroundColor: player.summonerName
                                                 .toLowerCase() ==
-                                            currentSummonerName.toLowerCase()
+                                        game.summonerName.toLowerCase()
                                         ? Colors.amberAccent
                                         : Colors.transparent,
                                     radius: CHAMP_AVATAR_SIZE + 2,
@@ -448,25 +441,25 @@ class _GameStatsTableScreenState extends State<GameStatsTableScreen> {
                                               ConstData.championsIdsNames[
                                                   player.championID.toString()])
                                           .image,
-                                      radius: CHAMP_AVATAR_SIZE-1,
+                                      radius: CHAMP_AVATAR_SIZE - 1,
                                     ),
                                   ),
                                 ),
                                 index: game.playersData.indexOf(player)),
                             getDataCell(
-                                Text(player.stats.goldEarned.toString()),
+                                Text(player.goldEarned.toString()),
                                 index: game.playersData.indexOf(player)),
                             getDataCell(
-                                Text(player.stats.visionScore.toString()),
+                                Text(player.visionScore.toString()),
                                 index: game.playersData.indexOf(player)),
                             getDataCell(
-                                Text(player.stats.totalDamageDealtToChampions
+                                Text(player.totalDamageDealtToChampions
                                     .toString()),
                                 index: game.playersData.indexOf(player)),
                             getDataCell(
-                                Text(player.stats.totalDamageTaken.toString()),
+                                Text(player.totalDamageTaken.toString()),
                                 index: game.playersData.indexOf(player)),
-                            getDataCell(Text(player.stats.totalHeal.toString()),
+                            getDataCell(Text(player.totalHeal.toString()),
                                 index: game.playersData.indexOf(player)),
                           ],
                         ),

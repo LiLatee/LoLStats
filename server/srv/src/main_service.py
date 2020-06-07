@@ -2,6 +2,7 @@ from flask import Flask, escape, request, send_file
 import os
 from match_history_data import get_n_match_history_games_for_player,get_profile_info_for_player,generate_champions_ids,generate_newest_patch,generate_summoners_ids,generate_perks_ids
 from icons_searching import get_perks_img_for_id,get_s_spell_img_for_id
+from pathlib import Path
 
 app = Flask(__name__)
 
@@ -14,9 +15,7 @@ UPLOAD_FOLDER_PATH = '/data'
 
 @app.route('/')
 def hello():
-    return '''[
-        {"name": "Marcin", "lastname": "Wiecny"}
-    ]'''
+    return 'hello there! :)'
 
 
 @app.route('/get_player_history_nick/<nick>')
@@ -59,14 +58,14 @@ def get_newest_patch():
 
 @app.route('/get_perk_icon/<id>')
 def get_perk_icon(id):
-    path = os.getcwd()+ UPLOAD_FOLDER_PATH + get_perks_img_for_id(int(id),PERKS)
-    print(path)
+    current_file_directory = str(Path(__file__).parent)
+    path = Path(current_file_directory + UPLOAD_FOLDER_PATH + get_perks_img_for_id(int(id),PERKS))  
     return send_file(path, mimetype='image/png')
 
 @app.route('/get_s_spell_icon/<id>')
 def get_s_spell_icon(id): 
-
-    path = os.getcwd()+ UPLOAD_FOLDER_PATH + get_s_spell_img_for_id(id,S_SPELLS)
+    current_file_directory = str(Path(__file__).parent)
+    path = Path(current_file_directory + UPLOAD_FOLDER_PATH + get_s_spell_img_for_id(int(id),S_SPELLS))
     return send_file(path, mimetype='image/png')
 
 
@@ -74,4 +73,7 @@ def get_s_spell_icon(id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
+    # p = Path("D:\\Dokumenty\\Projekty\\AndroidStudioProjects\\lol_stats\\server\\data\\perks\\Styles\\Precision\\Overheal.png")
+    # print(p.parent)
+
     

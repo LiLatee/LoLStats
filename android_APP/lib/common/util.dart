@@ -40,3 +40,15 @@ Image getItemIcon(int ID) {
       "http://ddragon.leagueoflegends.com/cdn/10.11.1/img/item/$ID.png",
       fit: BoxFit.fill);
 }
+
+Image getPerkIcon(int ID) {
+  return Image.network(
+      ConstData.SERVER_ADDRESS + "get_perk_icon/$ID",
+      fit: BoxFit.fill);
+}
+
+Image getSummonerSpellIcon(int ID) {
+  return Image.network(
+      ConstData.SERVER_ADDRESS + "get_s_spell_icon/$ID",
+      fit: BoxFit.fill);
+}

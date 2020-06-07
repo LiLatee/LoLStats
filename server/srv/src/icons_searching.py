@@ -4,6 +4,7 @@ import pandas as pd
 from pandas import json_normalize
 import re
 import os
+from pathlib import Path
 
 def get_perks_img_for_id(perks_id,perks_all): 
     path = re.findall('(?<=Styles/).*$', perks_all[perks_id]['path'])

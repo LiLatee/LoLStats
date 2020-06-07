@@ -91,7 +91,7 @@ class CustomSearchDelegate extends SearchDelegate {
         ],
       );
     }
-    return UserScreen(userName: query);
+    return UserScreen(summonerName: query);
 
   }
 

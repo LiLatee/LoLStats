@@ -3,14 +3,16 @@ class User {
   final String accountID;
   final String name;
   final int summonerLevel;
-  final List<QueueData> queuesData;
+  final QueueData rankedSoloDuo5x5;
+  final QueueData rankedFlex5x5;
 
   User(
       {this.profileIconId,
       this.accountID,
       this.name,
       this.summonerLevel,
-      this.queuesData});
+      this.rankedSoloDuo5x5,
+      this.rankedFlex5x5});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -18,9 +20,9 @@ class User {
         accountID: json['accountID'],
         name: json['name'],
         summonerLevel: json['summonerLevel'],
-        queuesData: json['ranked_data']
-            .map<QueueData>((queueJson) => QueueData.fromJson(queueJson))
-            .toList());
+        rankedSoloDuo5x5: QueueData.fromJson(json['ranked_data']['RANKED_SOLO_5x5']),
+        rankedFlex5x5: QueueData.fromJson(json['ranked_data']['RANKED_FLEX_SR']),
+    );
   }
 }
 

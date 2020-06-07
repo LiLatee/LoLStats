@@ -4,7 +4,7 @@ import pandas as pd
 from pandas import json_normalize
 
 # https://developer.riotgames.com/
-KEY= "RGAPI-5e6d6bbb-3fd8-433a-b6c1-694ce2afa4ee"
+KEY= "RGAPI-2181b266-36fa-4ca9-b6c7-5860cc106ac0"
 
 
 
@@ -207,7 +207,7 @@ def generate_summoners_ids():
     summoners_json = r.json()
     summoners = dict()
     for summoner in summoners_json['data']:
-        summoners[summoners_json['data'][summoner]['key']] = summoners_json['data'][summoner]['name']
+        summoners[int(summoners_json['data'][summoner]['key'])] = summoners_json['data'][summoner]['name']
 
     return summoners
 
@@ -222,5 +222,5 @@ def generate_perks_ids():
         r['name'] = rune['name']
         r['path'] = rune['iconPath']
         perks_with_path[rune['id']] = r
-        runes[rune['id']] = rune['name']
+        runes[int(rune['id'])] = rune['name']
     return runes,perks_with_path
