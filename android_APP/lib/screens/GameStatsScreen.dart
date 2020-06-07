@@ -13,6 +13,7 @@ import 'package:lolstats/common/ConstData.dart' as ConstData;
 import 'package:lolstats/screens/UserScreen.dart';
 import 'package:lolstats/screens/GraphStats.dart';
 import 'package:lolstats/common/DeviceSizes.dart' as DeviceSizes;
+import 'dart:math';
 
 class GameStatsPlayersTableScreen extends StatefulWidget {
   final Game game;
@@ -55,8 +56,7 @@ class _GameStatsPlayersTableScreenState
           .map<int>((e) => e.totalDamageDealtToChampions)
           .toList();
     } else if (chosenStat == statsList[1]) {
-      values =
-          game.playersData.map<int>((e) => e.totalDamageTaken).toList();
+      values = game.playersData.map<int>((e) => e.totalDamageTaken).toList();
     } else if (chosenStat == statsList[2]) {
       values = game.playersData.map<int>((e) => e.totalHeal).toList();
     } else if (chosenStat == statsList[3]) {
@@ -68,8 +68,9 @@ class _GameStatsPlayersTableScreenState
 
   @override
   Widget build(BuildContext context) {
-    const double CHAMP_AVATAR_SIZE = 18.0;
-    const double EDGE_INSECTS_IN_TEAMS_INFO = 8.0;
+    final double ROW_HEIGHT = 40 * DeviceSizes.getScaleFactor(context: context);
+    final double PADDING_BETWEEN_ROWS =
+        3 * DeviceSizes.getScaleFactor(context: context);
 
     Widget createRow({PlayerData player}) {
       Color color =
@@ -79,49 +80,55 @@ class _GameStatsPlayersTableScreenState
 
       Widget avatarSection = CircleAvatar(
         backgroundColor: color,
-        radius: CHAMP_AVATAR_SIZE + 2,
+        radius: ROW_HEIGHT / 2,
         child: CircleAvatar(
           backgroundImage: util
               .getChampionAvatar(
                   ConstData.championsIdsNames[player.championID.toString()])
               .image,
-          radius: CHAMP_AVATAR_SIZE - 2,
+          radius: (ROW_HEIGHT / 2) * 0.9,
         ),
       );
 
       Widget spellsRunesSection = Container(
-          padding: EdgeInsets.only(left: 8.0),
+          padding: EdgeInsets.only(left: 5.0),
           child: Row(
             children: <Widget>[
               Column(
                 children: <Widget>[
                   Container(
-                    height: CHAMP_AVATAR_SIZE,
-                    width: CHAMP_AVATAR_SIZE,
-                    child: Image.network(
-                        'https://vignette.wikia.nocookie.net/leagueoflegends/images/7/74/Flash.png/revision/latest?cb=20180514003149'),
+                    padding: EdgeInsets.only(bottom: 1.0, right: 1.0),
+                    height: ROW_HEIGHT / 2,
+                    width: ROW_HEIGHT / 2,
+                    child:
+                        util.getSummonerSpellIcon(player.firstSummonerSpellID),
                   ),
                   Container(
-                    height: CHAMP_AVATAR_SIZE,
-                    width: CHAMP_AVATAR_SIZE,
-                    child: Image.network(
-                        'https://vignette.wikia.nocookie.net/leagueoflegends/images/f/f4/Ignite.png/revision/latest?cb=20180514003345'),
+                    padding: EdgeInsets.only(top: 1.0, right: 1.0),
+                    height: ROW_HEIGHT / 2,
+                    width: ROW_HEIGHT / 2,
+                    child:
+                        util.getSummonerSpellIcon(player.secondSummonerSpellID),
                   ),
                 ],
               ),
               Column(
                 children: <Widget>[
-                  CircleAvatar(
-                    backgroundColor: Colors.transparent,
-                    radius: CHAMP_AVATAR_SIZE / 2,
-                    child: Image.network(
-                        'https://vignette.wikia.nocookie.net/leagueoflegends/images/f/f2/Lethal_Tempo_rune.png/revision/latest/scale-to-width-down/64?cb=20171126182145'),
+                  Container(
+//                    padding: EdgeInsets.only(bottom: 1.0, left: 1.0),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      maxRadius: ROW_HEIGHT / 4,
+                      backgroundImage: util.getPerkIcon(player.perk0).image,
+                    ),
                   ),
-                  CircleAvatar(
-                    backgroundColor: Colors.transparent,
-                    radius: CHAMP_AVATAR_SIZE / 2,
-                    child: Image.network(
-                        'https://vignette.wikia.nocookie.net/leagueoflegends/images/1/1e/Domination_icon.png/revision/latest/scale-to-width-down/28?cb=20170926031123'),
+                  Container(
+//                    padding: EdgeInsets.only(top: 1.0, left: 1.0),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      maxRadius: ROW_HEIGHT / 4,
+                      backgroundImage: util.getChampionAvatar('Zed').image,
+                    ),
                   ),
                 ],
               ),
@@ -149,10 +156,9 @@ class _GameStatsPlayersTableScreenState
                       ),
                     ))),
         child: Container(
-          alignment: Alignment.centerLeft,
-          padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
+          padding: EdgeInsets.only(left: 5.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Row(children: <Widget>[
                 Text(
@@ -161,7 +167,8 @@ class _GameStatsPlayersTableScreenState
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
-                    fontSize: 12.0,
+                    fontSize:
+                        14.0 * DeviceSizes.getScaleFactor(context: context),
                   ),
                 ),
               ]),
@@ -169,15 +176,20 @@ class _GameStatsPlayersTableScreenState
                 children: <Widget>[
                   Text(player.kda.toString(),
                       style: TextStyle(
-                        fontSize: 12.0,
+                        fontSize:
+                            12.0 * DeviceSizes.getScaleFactor(context: context),
                       )),
                   Text("\t"),
                   Text(kdaRatio.toString(),
                       style: TextStyle(
-                          fontSize: 12.0, fontWeight: FontWeight.bold)),
+                          fontSize: 12.0 *
+                              DeviceSizes.getScaleFactor(context: context),
+                          fontWeight: FontWeight.bold)),
                   Text("\t"),
                   Text("cs: " + player.totalMinionsKilled.toString(),
-                      style: TextStyle(fontSize: 12)),
+                      style: TextStyle(
+                          fontSize: 12.0 *
+                              DeviceSizes.getScaleFactor(context: context))),
                 ],
               ),
             ],
@@ -196,7 +208,7 @@ class _GameStatsPlayersTableScreenState
       ];
 
       Widget itemsSection = Container(
-        padding: EdgeInsets.only(left: EDGE_INSECTS_IN_TEAMS_INFO),
+        padding: EdgeInsets.only(left: 1.0),
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             return Row(
@@ -206,8 +218,10 @@ class _GameStatsPlayersTableScreenState
                         child: (itemID != 0)
                             ? util.getItemIcon(itemID)
                             : CustomWidgets.getEmtpyItem(context),
-                        width: constraints.maxWidth / 7,
-                        height: constraints.maxWidth / 7,
+                        width:
+                            min(constraints.maxWidth / 7, (ROW_HEIGHT) * 0.8),
+                        height:
+                            min(constraints.maxWidth / 7, (ROW_HEIGHT) * 0.8),
                       ))
                   .toList(),
             );
@@ -216,23 +230,20 @@ class _GameStatsPlayersTableScreenState
       );
 
       return Container(
-        height: (CHAMP_AVATAR_SIZE + 5) * 2,
+        height: ROW_HEIGHT + 2 * PADDING_BETWEEN_ROWS,
         child: Stack(
           children: <Widget>[
-            LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-              return Opacity(
-                opacity: 0.3,
-                child: Container(
-                  width: DeviceSizes.getWidth(context: context),
-                  height: constraints.maxHeight,
-                  color: color,
-                ),
-              );
-            }),
+            Opacity(
+              opacity: 0.3,
+              child: Container(
+                width: DeviceSizes.getWidth(context: context),
+                height: ROW_HEIGHT + 2 * PADDING_BETWEEN_ROWS,
+                color: color,
+              ),
+            ),
             Container(
-              color: Colors.transparent,
-              padding: EdgeInsets.all(5.0),
+//              color: Colors.transparent,
+              padding: EdgeInsets.all(PADDING_BETWEEN_ROWS),
               child: Row(
                 children: <Widget>[
                   avatarSection,
@@ -278,38 +289,46 @@ class _GameStatsPlayersTableScreenState
     // TODO jakis error pojawia się z RenderFlex overflowed
     Widget graphPage = Container(
       margin: EdgeInsets.all(5),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DropdownButton<String>(
-            value: dropdownValue,
-            icon: Icon(Icons.arrow_downward),
-            iconSize: 24,
-            elevation: 16,
-            style: TextStyle(color: Colors.white),
-            underline: Container(
-              height: 2,
-              color: baseTheme.accentColor,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            DropdownButton<String>(
+              value: dropdownValue,
+              icon: Icon(Icons.arrow_downward),
+              iconSize: 24 * DeviceSizes.getScaleFactor(context: context),
+              elevation:
+                  17 * DeviceSizes.getScaleFactor(context: context).toInt(),
+              style: TextStyle(color: Colors.white),
+              underline: Container(
+                height: 2 * DeviceSizes.getScaleFactor(context: context),
+                color: baseTheme.accentColor,
+              ),
+              onChanged: (String newValue) {
+                setState(() {
+                  dropdownValue = newValue;
+                  setValuesForGraph(newValue);
+                });
+              },
+              items: statsList.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                        fontSize:
+                            12.0 * DeviceSizes.getScaleFactor(context: context)),
+                  ),
+                );
+              }).toList(),
             ),
-            onChanged: (String newValue) {
-              setState(() {
-                dropdownValue = newValue;
-                setValuesForGraph(newValue);
-              });
-            },
-            items: statsList.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
-          GraphStats(
-            values: values,
-            champsIds: champsIds,
-            currentUserIndex: currentSummonerChampID,
-          )
-        ],
+            GraphStats(
+              values: values,
+              champsIds: champsIds,
+              currentUserIndex: currentSummonerChampID,
+            )
+          ],
+        ),
       ),
     );
 
@@ -324,7 +343,9 @@ class _GameStatsPlayersTableScreenState
 //                BackButton(onPressed: () => Navigator.pop(context),),
                 TabBar(
                   tabs: <Widget>[
-                    Tab(text: 'Main Table'),
+                    Tab(
+                      text: 'Main Table',
+                    ),
                     Tab(text: 'Table Statistics'),
                     Tab(text: 'Graphs'),
                   ],
@@ -347,14 +368,20 @@ class _GameStatsPlayersTableScreenState
   }
 }
 
+
+
+
+
+
+
 class GameStatsTableScreen extends StatefulWidget {
   final Game game;
 
   GameStatsTableScreen({this.game});
 
   @override
-  _GameStatsTableScreenState createState() => _GameStatsTableScreenState(
-      game: game);
+  _GameStatsTableScreenState createState() =>
+      _GameStatsTableScreenState(game: game);
 }
 
 class _GameStatsTableScreenState extends State<GameStatsTableScreen> {
@@ -366,53 +393,94 @@ class _GameStatsTableScreenState extends State<GameStatsTableScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const double CHAMP_AVATAR_SIZE = 18.0;
+    final double ROW_HEIGHT = 40 * DeviceSizes.getScaleFactor(context: context);
 
     Widget getGameStatsTable() {
-      DataCell getDataCell(Widget child, {int index}) {
+      DataCell getDataCell(Widget child, {bool isAvatar=false, int index, PlayerData player}) {
+        Color opacityColor =
+            index < 5 ? AppColors.blueTeamColor : AppColors.redTeamColor;
+        if (game.summonerName == player.summonerName) {
+          opacityColor = Colors.amberAccent;
+        }
         return DataCell(
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                    color: index < 5
-                        ? AppColors.blueTeamColor
-                        : AppColors.redTeamColor,
-                    child: Align(
-                      child: child,
-                      alignment: Alignment.center,
-                    )),
-              ),
-            ],
+          Container(
+            width: isAvatar ? ROW_HEIGHT + 6.0 : (DeviceSizes.getWidth(context: context)-(ROW_HEIGHT + 6.0))/5,
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  color: index < 5
+                      ? AppColors.blueTeamColor
+                      : AppColors.redTeamColor,
+                ),
+                Opacity(
+                  opacity: 0.3,
+                  child: Container(
+                    color: opacityColor,
+                  ),
+                ),
+                Container(
+                  child: Align(
+                    child: child,
+                    alignment: Alignment.center,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }
 
       DataColumn getDataColumn(String columnName, {isAvatar = false}) {
         return DataColumn(
-            label: Container(
-              width: isAvatar ? CHAMP_AVATAR_SIZE * 1.5 : 55,
-              child: Text(
-                columnName,
-                softWrap: true,
-                style: Theme.of(context).textTheme.headline4,
+            label: Expanded(
+              child: Container(
+                width: isAvatar
+                    ? ROW_HEIGHT / 2 * 1.5
+                    : 55 * DeviceSizes.getScaleFactor(context: context),
+                child: Text(
+                  columnName,
+                  softWrap: true,
+                  style: TextStyle(
+                    fontSize: 12 * DeviceSizes.getScaleFactor(context: context),
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
             numeric: true);
       }
 
+      Widget getChampCircleAvatar({PlayerData player}) {
+        return Container(
+          child: CircleAvatar(
+            backgroundColor: player.summonerName == game.summonerName
+                ? Colors.amberAccent
+                : Colors.transparent,
+            radius: ROW_HEIGHT / 2,
+            child: CircleAvatar(
+              backgroundImage: util
+                  .getChampionAvatar(
+                      ConstData.championsIdsNames[player.championID.toString()])
+                  .image,
+              radius: (ROW_HEIGHT / 2) * 0.9,
+            ),
+          ),
+        );
+      }
+
       Widget gameStatsTable = Container(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Container(
                 color: baseTheme.primaryColor,
                 child: DataTable(
-                  headingRowHeight: 40.0,
+                  dataRowHeight: ROW_HEIGHT + 6.0,
+                  headingRowHeight:
+                      40.0 * DeviceSizes.getScaleFactor(context: context),
                   horizontalMargin: 0.0,
-                  columnSpacing: 0.0,
+                  columnSpacing: 1.0,
                   columns: [
                     getDataColumn('', isAvatar: true),
                     getDataColumn('Gold Earned'),
@@ -426,41 +494,36 @@ class _GameStatsTableScreenState extends State<GameStatsTableScreen> {
                         (player) => DataRow(
                           cells: [
                             getDataCell(
-                                Container(
-                                  padding: EdgeInsets.all(5),
-                                  child: CircleAvatar(
-                                    backgroundColor: player.summonerName
-                                                .toLowerCase() ==
-                                        game.summonerName.toLowerCase()
-                                        ? Colors.amberAccent
-                                        : Colors.transparent,
-                                    radius: CHAMP_AVATAR_SIZE + 2,
-                                    child: CircleAvatar(
-                                      backgroundImage: util
-                                          .getChampionAvatar(
-                                              ConstData.championsIdsNames[
-                                                  player.championID.toString()])
-                                          .image,
-                                      radius: CHAMP_AVATAR_SIZE - 1,
-                                    ),
-                                  ),
-                                ),
-                                index: game.playersData.indexOf(player)),
+                              getChampCircleAvatar(player: player),
+                              player: player,
+                              isAvatar: true,
+                              index: game.playersData.indexOf(player),
+                            ),
                             getDataCell(
-                                Text(player.goldEarned.toString()),
-                                index: game.playersData.indexOf(player)),
+                              Text(player.goldEarned.toString(), style: TextStyle(fontSize: 12.0 * DeviceSizes.getScaleFactor(context: context)),),
+                              player: player,
+                              index: game.playersData.indexOf(player),
+                            ),
                             getDataCell(
-                                Text(player.visionScore.toString()),
-                                index: game.playersData.indexOf(player)),
+                              Text(player.visionScore.toString(), style: TextStyle(fontSize: 12.0 * DeviceSizes.getScaleFactor(context: context)),),
+                              player: player,
+                              index: game.playersData.indexOf(player),
+                            ),
                             getDataCell(
                                 Text(player.totalDamageDealtToChampions
-                                    .toString()),
+                                    .toString(), style: TextStyle(fontSize: 12.0 * DeviceSizes.getScaleFactor(context: context)),),
+                                player: player,
                                 index: game.playersData.indexOf(player)),
                             getDataCell(
-                                Text(player.totalDamageTaken.toString()),
-                                index: game.playersData.indexOf(player)),
-                            getDataCell(Text(player.totalHeal.toString()),
-                                index: game.playersData.indexOf(player)),
+                              Text(player.totalDamageTaken.toString(), style: TextStyle(fontSize: 12.0 * DeviceSizes.getScaleFactor(context: context)),),
+                              player: player,
+                              index: game.playersData.indexOf(player),
+                            ),
+                            getDataCell(
+                              Text(player.totalHeal.toString(), style: TextStyle(fontSize: 12.0 * DeviceSizes.getScaleFactor(context: context)),),
+                              player: player,
+                              index: game.playersData.indexOf(player),
+                            ),
                           ],
                         ),
                       )
@@ -471,15 +534,11 @@ class _GameStatsTableScreenState extends State<GameStatsTableScreen> {
           ],
         ),
       );
+
       return gameStatsTable;
     }
 
-    return Container(
-      child: ListView(
-        children: <Widget>[
-          getGameStatsTable(),
-        ],
-      ),
-    );
+    return getGameStatsTable();
+
   }
 }
