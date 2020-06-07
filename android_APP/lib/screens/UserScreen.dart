@@ -400,9 +400,7 @@ class _UserScreen extends State<UserScreen> {
                           user.queuesData[0].wins,
                           user.queuesData[0].losses,
                           // TODO: zastąpić 0 przez SOLO/DUO itd.
-                          user.queuesData[0].tier +
-                              " " +
-                              user.queuesData[0].rank,
+                          user.queuesData[0].tier + " " + user.queuesData[0].rank,
                           exampleDivisionIconLink),
                       getGamesStatsText(
                           "Flex: ",
