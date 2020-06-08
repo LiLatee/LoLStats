@@ -59,6 +59,7 @@ class _HomeScreen extends State<HomeScreen> {
 
     _downloadConstData();
 
+
     return Scaffold(
       appBar: AppBars.baseAppBar(context),
       body: Center(
