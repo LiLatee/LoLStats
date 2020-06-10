@@ -4,7 +4,7 @@ import pandas as pd
 from pandas import json_normalize
 
 # https://developer.riotgames.com/
-KEY= "RGAPI-2181b266-36fa-4ca9-b6c7-5860cc106ac0"
+KEY= "RGAPI-9c803695-ebb9-45c2-9e46-6b0361f71d47"
 
 
 
@@ -202,7 +202,7 @@ def generate_newest_patch():
     return versions[0]
 
 def generate_summoners_ids():
-    summoners_url = 'http://ddragon.leagueoflegends.com/cdn/10.11.1/data/en_US/summoner.json'
+    summoners_url = 'http://ddragon.leagueoflegends.com/cdn/10.11.1/data/en_US/summoner.json' # TODO tu jest numer patcha w URL
     r = requests.get(url = summoners_url) 
     summoners_json = r.json()
     summoners = dict()

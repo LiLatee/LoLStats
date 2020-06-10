@@ -404,10 +404,9 @@ class _GameStatsTableScreenState extends State<GameStatsTableScreen> {
         }
         return DataCell(
           Container(
-            width: isAvatar ? ROW_HEIGHT + 6.0 : (DeviceSizes.getWidth(context: context)-(ROW_HEIGHT + 6.0))/5,
             child: Stack(
               children: <Widget>[
-                Container(
+                 Container(
                   color: index < 5
                       ? AppColors.blueTeamColor
                       : AppColors.redTeamColor,
@@ -432,18 +431,16 @@ class _GameStatsTableScreenState extends State<GameStatsTableScreen> {
 
       DataColumn getDataColumn(String columnName, {isAvatar = false}) {
         return DataColumn(
-            label: Expanded(
-              child: Container(
-                width: isAvatar
-                    ? ROW_HEIGHT / 2 * 1.5
-                    : 55 * DeviceSizes.getScaleFactor(context: context),
-                child: Text(
-                  columnName,
-                  softWrap: true,
-                  style: TextStyle(
-                    fontSize: 12 * DeviceSizes.getScaleFactor(context: context),
-                    color: Colors.white,
-                  ),
+            label: Container(
+              width: isAvatar
+                  ? ROW_HEIGHT / 2 * 1.5
+                  : 55 * DeviceSizes.getScaleFactor(context: context),
+              child: Text(
+                columnName,
+                softWrap: true,
+                style: TextStyle(
+                  fontSize: 12 * DeviceSizes.getScaleFactor(context: context),
+                  color: Colors.white,
                 ),
               ),
             ),

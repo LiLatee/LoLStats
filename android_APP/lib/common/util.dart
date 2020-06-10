@@ -37,7 +37,7 @@ Image getProfileIcon(String ID) {
 
 Image getItemIcon(int ID) {
   return Image.network(
-      "http://ddragon.leagueoflegends.com/cdn/10.11.1/img/item/$ID.png",
+      "http://ddragon.leagueoflegends.com/cdn/${ConstData.newestPatch}/img/item/$ID.png",
       fit: BoxFit.fill);
 }
 
