@@ -223,4 +223,38 @@ def generate_perks_ids():
         r['path'] = rune['iconPath']
         perks_with_path[rune['id']] = r
         runes[int(rune['id'])] = rune['name']
+
+    runes_url = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perkstyles.json'
+    r = requests.get(url = runes_url) 
+    runes_json = r.json()
+
+    for rune in runes_json['styles']:
+        # print(rune)
+        r = dict()
+        r['name'] = rune['name']
+        r['path'] = rune['iconPath']
+        perks_with_path[rune['id']] = r
+        runes[int(rune['id'])] = rune['name']
+
     return runes,perks_with_path
+
+
+# def generate_perks_styles_ids():
+#     runes_url = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perkstyles.json'
+#     r = requests.get(url = runes_url) 
+#     runes_json = r.json()
+#     runes = dict()
+#     perks_with_path = dict()
+
+
+#     for rune in runes_json['styles']:
+#         # print(rune)
+#         r = dict()
+#         r['name'] = rune['name']
+#         r['path'] = rune['iconPath']
+#         perks_with_path[rune['id']] = r
+#         runes[int(rune['id'])] = rune['name']
+#     return runes,perks_with_path
+
+# r, p = generate_perks_styles_ids()
+# print(p)

@@ -1,6 +1,6 @@
 from flask import Flask, escape, request, send_file
 import os
-from match_history_data import get_n_match_history_games_for_player,get_profile_info_for_player,generate_champions_ids,generate_newest_patch,generate_summoners_ids,generate_perks_ids
+from match_history_data import get_n_match_history_games_for_player,get_profile_info_for_player,generate_champions_ids,generate_newest_patch,generate_summoners_ids,generate_perks_ids,generate_perks_styles_ids
 from icons_searching import get_perks_img_for_id,get_s_spell_img_for_id
 from pathlib import Path
 
@@ -8,6 +8,8 @@ app = Flask(__name__)
 
 
 _,PERKS = generate_perks_ids()
+# _,PERKS_STYLES = generate_perks_styles_ids()
+
 S_SPELLS = generate_summoners_ids()
 
 UPLOAD_FOLDER_PATH = '/data'
@@ -61,6 +63,12 @@ def get_perk_icon(id):
     current_file_directory = str(Path(__file__).parent)
     path = Path(current_file_directory + UPLOAD_FOLDER_PATH + get_perks_img_for_id(int(id),PERKS))  
     return send_file(path, mimetype='image/png')
+
+# @app.route('/get_perk_style_icon/<id>')
+# def get_perk_icon(id):
+#     current_file_directory = str(Path(__file__).parent)
+#     path = Path(current_file_directory + UPLOAD_FOLDER_PATH + get_perks_styles_img_for_id(int(id),PERKS))  
+#     return send_file(path, mimetype='image/png')
 
 @app.route('/get_s_spell_icon/<id>')
 def get_s_spell_icon(id): 
