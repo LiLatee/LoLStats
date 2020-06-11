@@ -127,7 +127,7 @@ class _GameStatsPlayersTableScreenState
                     child: CircleAvatar(
                       backgroundColor: Colors.transparent,
                       maxRadius: ROW_HEIGHT / 4,
-                      backgroundImage: util.getChampionAvatar('Zed').image,
+                      backgroundImage: util.getPerkIcon(player.perkSubStyle).image,
                     ),
                   ),
                 ],

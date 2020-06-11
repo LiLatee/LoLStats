@@ -65,7 +65,7 @@ class _HomeScreen extends State<HomeScreen> {
       body: Center(
           child: WebView(
         initialUrl:
-            "https://eune.leagueoflegends.com/pl-pl/news/game-updates/patch-10-11-notes/",
+            "https://eune.leagueoflegends.com/en-us/news/game-updates/patch-10-11-notes/",
       )),
     );
   }
