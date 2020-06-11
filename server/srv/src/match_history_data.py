@@ -4,7 +4,7 @@ import pandas as pd
 from pandas import json_normalize
 
 # https://developer.riotgames.com/
-KEY= "RGAPI-9c803695-ebb9-45c2-9e46-6b0361f71d47"
+KEY= "RGAPI-7c4d7bfd-80eb-4d43-8e2f-8a072a8721ab"
 
 
 
@@ -238,23 +238,33 @@ def generate_perks_ids():
 
     return runes,perks_with_path
 
+def get_current_game(summoner_id):
+    header = {"X-Riot-Token": "{0}".format(KEY)}
+    current_url = "https://eun1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/{0}".format(summoner_id)
+    r = requests.get(url = current_url,headers=header) 
+    current_game = r.json()
+    return current_game
 
-# def generate_perks_styles_ids():
-#     runes_url = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perkstyles.json'
-#     r = requests.get(url = runes_url) 
-#     runes_json = r.json()
-#     runes = dict()
-#     perks_with_path = dict()
+def generate_current_game(summonername):
+    summoner_data = get_summoner_data_by_name(summonername)
+    match_data = get_current_game(summoner_data['id'])
+    
+    game_data = dict()
+    players_data = []
 
+    main_player_id_from_game = 1
 
-#     for rune in runes_json['styles']:
-#         # print(rune)
-#         r = dict()
-#         r['name'] = rune['name']
-#         r['path'] = rune['iconPath']
-#         perks_with_path[rune['id']] = r
-#         runes[int(rune['id'])] = rune['name']
-#     return runes,perks_with_path
+    game_data['gameMode'] = match_data['gameMode']
+    game_data['gameStartTime'] = match_data['gameStartTime']
 
-# r, p = generate_perks_styles_ids()
-# print(p)
+    for player in match_data['participants']:
+        temp_player = dict()
+        temp_player['s_spells'] = [player['spell1Id'],player['spell2Id']]
+        temp_player['perks'] = [player['perks']['perkIds'][0],player['perks']['perkSubStyle']]
+        temp_player['summonerName'] = player['summonerName']
+        temp_player['championId'] = player['championId']
+        temp_player['ranked_data'] = get_ranked_data_for_sum_id(player['summonerId'])
+        players_data.append(temp_player)
+    game_data['players_data'] = players_data
+    game_data['bannedChampions'] = match_data['bannedChampions']
+    return game_data
