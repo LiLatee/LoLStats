@@ -4,7 +4,7 @@ import pandas as pd
 from pandas import json_normalize
 
 # https://developer.riotgames.com/
-KEY= "RGAPI-9c803695-ebb9-45c2-9e46-6b0361f71d47"
+KEY= "YOUR_RIOT_GAMES_API_KEY"
 
 
 
