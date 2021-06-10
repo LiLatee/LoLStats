@@ -1,6 +1,7 @@
-# lolstats
+# LolStats
 
-A new Flutter application.
+First Flutter applications created for purposes of college project.
+![Video](https://imgur.com/a/KmjTxog)
 
 ## Getting Started
 
