@@ -1,7 +1,8 @@
 # LolStats
 
 First Flutter applications created for purposes of college project.
-![Video](https://i.imgur.com/9pdTC3k.gif)
+![Video](https://i.imgur.com/9pdTC3k.gif | width=100)
+
 
 ## Getting Started
 
