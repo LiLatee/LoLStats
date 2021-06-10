@@ -2,7 +2,7 @@
 
 First Flutter applications created for purposes of college project.
 
-<img src="https://imgur.com/a/zVLkZG9.gif" width="250">
+<img src="https://i.imgur.com/y0P8FmK.mp4" width="250">
 
 
 ## Getting Started
